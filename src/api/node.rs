@@ -13,7 +13,7 @@ impl NodeApi {
         Self { client }
     }
 
-    pub async fn get_nodes(&self) -> Result<Vec<RabbitMqNode>, RabbitMqClientError> {
+    pub async fn list_nodes(&self) -> Result<Vec<RabbitMqNode>, RabbitMqClientError> {
         let response = self
             .client
             .request(reqwest::Method::GET, "http://localhost:15672/api/nodes")
@@ -23,12 +23,12 @@ impl NodeApi {
         handle_response(response).await
     }
 
-    pub async fn get_node(&self, node_name: String) -> Result<RabbitMqNode, RabbitMqClientError> {
+    pub async fn get_node(&self, node: String) -> Result<RabbitMqNode, RabbitMqClientError> {
         let response = self
             .client
             .request(
                 reqwest::Method::GET,
-                format!("http://localhost:15672/api/nodes/{}", node_name),
+                format!("http://localhost:15672/api/nodes/{}", node),
             )
             .send()
             .await?;

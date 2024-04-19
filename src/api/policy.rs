@@ -1,0 +1,124 @@
+use crate::api::_generic::handle_response;
+use crate::errors::RabbitMqClientError;
+use reqwest_middleware::ClientWithMiddleware;
+use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
+
+pub struct PolicyApi {
+    client: ClientWithMiddleware,
+}
+
+impl PolicyApi {
+    pub fn new(client: ClientWithMiddleware) -> Self {
+        Self { client }
+    }
+
+    pub async fn list_policies(
+        &self,
+        vhost: Option<String>,
+    ) -> Result<Vec<RabbitMqPolicy>, RabbitMqClientError> {
+        let response = self
+            .client
+            .request(
+                reqwest::Method::GET,
+                format!(
+                    "http://localhost:15672/api/policies/{}",
+                    vhost.unwrap_or_default()
+                ),
+            )
+            .send()
+            .await?;
+
+        handle_response(response).await
+    }
+
+    pub async fn get_policy(
+        &self,
+        vhost: String,
+        policy: String,
+    ) -> Result<RabbitMqPolicy, RabbitMqClientError> {
+        let response = self
+            .client
+            .request(
+                reqwest::Method::GET,
+                format!("http://localhost:15672/api/policies/{}/{}", vhost, policy),
+            )
+            .send()
+            .await?;
+
+        handle_response(response).await
+    }
+
+    pub async fn create_policy(
+        &self,
+        vhost: String,
+        policy: String,
+        body: RabbitMqPolicyRequest,
+    ) -> Result<(), RabbitMqClientError> {
+        let policies = self.list_policies(Some(vhost.clone())).await?;
+        if let Some(existing) = policies.iter().find(|v| v.name == policy) {
+            return Err(RabbitMqClientError::AlreadyExists(format!(
+                "{} policy",
+                existing.name
+            )));
+        }
+
+        self.update_policy(vhost, policy, body).await
+    }
+
+    pub async fn update_policy(
+        &self,
+        vhost: String,
+        policy: String,
+        body: RabbitMqPolicyRequest,
+    ) -> Result<(), RabbitMqClientError> {
+        let response = self
+            .client
+            .request(
+                reqwest::Method::PUT,
+                format!("http://localhost:15672/api/policies/{}/{}", vhost, policy),
+            )
+            .json(&body)
+            .send()
+            .await?;
+
+        handle_response(response).await
+    }
+
+    pub async fn delete_policy(
+        &self,
+        vhost: String,
+        policy: String,
+    ) -> Result<(), RabbitMqClientError> {
+        let response = self
+            .client
+            .request(
+                reqwest::Method::DELETE,
+                format!("http://localhost:15672/api/policies/{}/{}", vhost, policy),
+            )
+            .send()
+            .await?;
+
+        handle_response(response).await
+    }
+}
+
+#[derive(Debug, Deserialize)]
+pub struct RabbitMqPolicy {
+    name: String,
+}
+
+#[derive(Debug, Serialize)]
+pub struct RabbitMqPolicyRequest {
+    pattern: String,
+    definition: HashMap<String, RabbitMqPolicyDefinitionValue>,
+    priority: Option<i64>,
+    #[serde(rename = "apply-to")]
+    apply_to: Option<String>,
+}
+
+#[derive(Debug, Serialize)]
+pub enum RabbitMqPolicyDefinitionValue {
+    String(String),
+    Integer(i64),
+}

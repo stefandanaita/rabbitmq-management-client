@@ -1,4 +1,11 @@
 mod _generic;
+mod binding;
 mod cluster_name;
+mod exchange;
 mod node;
 mod overview;
+mod permission;
+mod policy;
+mod queue;
+mod user;
+mod vhost;

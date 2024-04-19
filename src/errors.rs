@@ -4,6 +4,8 @@ use http::StatusCode;
 pub enum RabbitMqClientError {
     #[error("Unauthorized")]
     Unauthorized,
+    #[error("Resource already exists: {0}")]
+    AlreadyExists(String),
     #[error("Failed to parse the API response: {0}")]
     ParsingError(#[source] reqwest::Error),
     #[error("Failed to execute the middleware: {0}")]
