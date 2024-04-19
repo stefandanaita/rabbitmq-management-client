@@ -1,22 +1,22 @@
+use crate::api::_generic::handle_response;
+use crate::api::overview::{RabbitMqContext, RabbitMqExchangeType};
+use crate::errors::RabbitMqClientError;
 use reqwest_middleware::ClientWithMiddleware;
 use serde::Deserialize;
-use crate::api::_generic::handle_response;
-use crate::errors::RabbitMqClientError;
 
 pub struct NodeApi {
     client: ClientWithMiddleware,
 }
 
 impl NodeApi {
-    pub fn new(client: ClientWithMiddleware) -> Self { Self { client } }
+    pub fn new(client: ClientWithMiddleware) -> Self {
+        Self { client }
+    }
 
     pub async fn get_nodes(&self) -> Result<Vec<RabbitMqNode>, RabbitMqClientError> {
         let response = self
             .client
-            .request(
-                reqwest::Method::GET,
-                "http://localhost:15672/api/nodes",
-            )
+            .request(reqwest::Method::GET, "http://localhost:15672/api/nodes")
             .send()
             .await?;
 
@@ -36,7 +36,10 @@ impl NodeApi {
         handle_response(response).await
     }
 
-    pub async fn get_node_memory(&self, node_name: String) -> Result<RabbitMqNodeMemory, RabbitMqClientError> {
+    pub async fn get_node_memory(
+        &self,
+        node_name: String,
+    ) -> Result<RabbitMqNodeMemory, RabbitMqClientError> {
         let response = self
             .client
             .request(
@@ -64,10 +67,10 @@ pub struct RabbitMqNode {
     uptime: i64,
     run_queue: i64,
     processors: i64,
-    exchange_types: Vec<RabbitMqNodeExchangeType>,
+    exchange_types: Vec<RabbitMqExchangeType>,
     auth_mechanisms: Vec<RabbitMqNodeAuthMechanism>,
     applications: Vec<RabbitMqNodeApplication>,
-    contexts: Vec<RabbitMqNodeContext>,
+    contexts: Vec<RabbitMqContext>,
     log_files: Vec<String>,
     db_dir: String,
     config_files: Vec<String>,
@@ -78,14 +81,7 @@ pub struct RabbitMqNode {
     running: bool,
     #[serde(rename = "type")]
     kind: String,
-    mem_used: i64
-}
-
-#[derive(Debug, Deserialize)]
-pub struct RabbitMqNodeExchangeType {
-    name: String,
-    description: String,
-    enabled: bool,
+    mem_used: i64,
 }
 
 #[derive(Debug, Deserialize)]
@@ -100,15 +96,6 @@ pub struct RabbitMqNodeApplication {
     name: String,
     description: String,
     version: String,
-}
-
-#[derive(Debug, Deserialize)]
-pub struct RabbitMqNodeContext {
-    description: String,
-    path: String,
-    cowboy_opts: String,
-    port: String,
-    protocol: Option<String>,
 }
 
 #[derive(Debug, Deserialize)]

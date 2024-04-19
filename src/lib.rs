@@ -1,11 +1,11 @@
-use reqwest_middleware::{ClientBuilder, ClientWithMiddleware};
 use crate::config::RabbitMqClientConfig;
 use crate::errors::RabbitMqClientError;
+use reqwest_middleware::{ClientBuilder, ClientWithMiddleware};
 
+mod api;
 mod config;
 mod errors;
 mod middlewares;
-mod api;
 
 pub struct RabbitMqClient {
     pub client: ClientWithMiddleware,
@@ -32,12 +32,10 @@ impl RabbitMqClientBuilder {
     pub fn build(self) -> Result<RabbitMqClient, RabbitMqClientError> {
         let client: ClientWithMiddleware = match self.preset_client {
             None => self.new_client(),
-            Some(c) => c
+            Some(c) => c,
         };
 
-        Ok(RabbitMqClient {
-            client
-        })
+        Ok(RabbitMqClient { client })
     }
 
     fn new_client(self) -> ClientWithMiddleware {

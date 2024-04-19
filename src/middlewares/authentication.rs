@@ -9,7 +9,12 @@ pub struct AuthenticationMiddleware {
 
 #[async_trait]
 impl Middleware for AuthenticationMiddleware {
-    async fn handle(&self, req: Request, extensions: &mut http::Extensions, next: Next<'_>) -> reqwest_middleware::Result<Response> {
+    async fn handle(
+        &self,
+        req: Request,
+        extensions: &mut http::Extensions,
+        next: Next<'_>,
+    ) -> reqwest_middleware::Result<Response> {
         next.run(req, extensions).await
     }
 }
