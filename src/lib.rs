@@ -11,6 +11,7 @@ use crate::api::vhost::VhostApi;
 use crate::config::RabbitMqClientConfig;
 use crate::errors::RabbitMqClientError;
 use reqwest_middleware::{ClientBuilder, ClientWithMiddleware};
+use crate::middlewares::authentication::AuthenticationMiddleware;
 
 mod api;
 pub mod config;
@@ -57,7 +58,14 @@ impl RabbitMqClientBuilder {
     pub fn build(self) -> Result<RabbitMqClient, RabbitMqClientError> {
         let client: ClientWithMiddleware = self
             .preset_client
-            .unwrap_or_else(|| ClientBuilder::new(reqwest::Client::new()).build());
+            .unwrap_or_else(|| {
+                ClientBuilder::new(reqwest::Client::new())
+                    .with(AuthenticationMiddleware {
+                        username: self.config.rabbitmq_username,
+                        password: self.config.rabbitmq_password,
+                    })
+                    .build()
+            });
 
         Ok(RabbitMqClient {
             apis: build_apis(self.config.rabbitmq_api_url.clone(), client.clone()),
