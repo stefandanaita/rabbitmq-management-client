@@ -107,16 +107,16 @@ impl PolicyApi {
 
 #[derive(Debug, Deserialize)]
 pub struct RabbitMqPolicy {
-    name: String,
+    pub name: String,
 }
 
 #[derive(Debug, Serialize)]
 pub struct RabbitMqPolicyRequest {
-    pattern: String,
-    definition: HashMap<String, RabbitMqPolicyDefinitionValue>,
-    priority: Option<i64>,
+    pub pattern: String,
+    pub definition: HashMap<String, RabbitMqPolicyDefinitionValue>,
+    pub priority: Option<i64>,
     #[serde(rename = "apply-to")]
-    apply_to: Option<String>,
+    pub apply_to: Option<String>,
 }
 
 #[derive(Debug, Serialize)]

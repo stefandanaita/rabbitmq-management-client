@@ -170,38 +170,38 @@ impl ExchangeApi {
 
 #[derive(Debug, Deserialize)]
 pub struct RabbitMqExchange {
-    auto_delete: bool,
-    durable: bool,
-    internal: bool,
-    name: String,
+    pub auto_delete: bool,
+    pub durable: bool,
+    pub internal: bool,
+    pub name: String,
     #[serde(rename = "type")]
-    kind: String,
-    user_who_performed_action: String,
-    vhost: String,
-    message_stats: Option<RabbitMqExchangeMessageStats>,
+    pub kind: String,
+    pub user_who_performed_action: String,
+    pub vhost: String,
+    pub message_stats: Option<RabbitMqExchangeMessageStats>,
 }
 
 #[derive(Debug, Deserialize)]
 pub struct RabbitMqExchangeMessageStats {
-    publish_in: i64,
-    publish_out: i64,
+    pub publish_in: i64,
+    pub publish_out: i64,
 }
 
 #[derive(Debug, Serialize)]
 pub struct RabbitMqExchangeRequest {
     #[serde(rename = "type")]
-    kind: String,
-    auto_delete: Option<bool>,
-    durable: Option<bool>,
-    internal: Option<bool>,
+    pub kind: String,
+    pub auto_delete: Option<bool>,
+    pub durable: Option<bool>,
+    pub internal: Option<bool>,
 }
 
 #[derive(Debug, Serialize)]
 pub struct RabbitMqExchangeMessagePublishRequest {
-    properties: HashMap<String, String>,
-    routing_key: String,
-    payload: String,
-    payload_encoding: RabbitMqMessageEncoding,
+    pub properties: HashMap<String, String>,
+    pub routing_key: String,
+    pub payload: String,
+    pub payload_encoding: RabbitMqMessageEncoding,
 }
 
 #[derive(Debug, Serialize)]
@@ -214,5 +214,5 @@ pub enum RabbitMqMessageEncoding {
 
 #[derive(Debug, Deserialize)]
 pub struct RabbitMqExchangeMessagePublishResponse {
-    routed: bool,
+    pub routed: bool,
 }

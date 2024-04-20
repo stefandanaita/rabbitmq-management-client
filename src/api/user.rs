@@ -101,19 +101,19 @@ impl UserApi {
 
 #[derive(Debug, Deserialize)]
 pub struct RabbitMqWhoAmI {
-    name: String,
-    tags: Vec<String>,
+    pub name: String,
+    pub tags: Vec<String>,
 }
 
 #[derive(Debug, Deserialize)]
 pub struct RabbitMqUser {
-    name: String,
-    password_hash: String,
-    hashing_algorithm: String,
-    tags: Vec<String>,
+    pub name: String,
+    pub password_hash: String,
+    pub hashing_algorithm: String,
+    pub tags: Vec<String>,
 }
 
 #[derive(Debug, Serialize)]
 pub struct RabbitMqUsersBulkDeleteRequest {
-    users: Vec<String>,
+    pub users: Vec<String>,
 }

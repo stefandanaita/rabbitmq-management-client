@@ -133,25 +133,25 @@ impl VhostApi {
 
 #[derive(Debug, Deserialize)]
 pub struct RabbitMqVhost {
-    cluster_state: HashMap<String, String>,
-    default_queue_type: String,
-    description: String,
-    metadata: RabbitMqVhostMetadata,
-    name: String,
-    tags: Vec<String>,
-    tracing: bool,
+    pub cluster_state: HashMap<String, String>,
+    pub default_queue_type: String,
+    pub description: String,
+    pub metadata: RabbitMqVhostMetadata,
+    pub name: String,
+    pub tags: Vec<String>,
+    pub tracing: bool,
 }
 
 #[derive(Debug, Deserialize)]
 pub struct RabbitMqVhostMetadata {
-    description: String,
-    tags: Vec<String>,
+    pub description: String,
+    pub tags: Vec<String>,
 }
 
 #[derive(Debug, Deserialize)]
 pub struct RabbitMqVhostRequest {
-    name: String,
-    description: Option<String>,
-    tags: Vec<String>,
-    tracing: bool,
+    pub name: String,
+    pub description: Option<String>,
+    pub tags: Vec<String>,
+    pub tracing: bool,
 }

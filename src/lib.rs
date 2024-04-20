@@ -13,8 +13,8 @@ use crate::errors::RabbitMqClientError;
 use reqwest_middleware::{ClientBuilder, ClientWithMiddleware};
 
 mod api;
-mod config;
-mod errors;
+pub mod config;
+pub mod errors;
 mod middlewares;
 
 pub struct RabbitMqClient {
@@ -24,16 +24,16 @@ pub struct RabbitMqClient {
 }
 
 pub struct RabbitMqApis {
-    bindings: BindingApi,
-    connections: ConnectionApi,
-    exchanges: ExchangeApi,
-    nodes: NodeApi,
-    overview: OverviewApi,
-    permissions: PermissionApi,
-    policies: PolicyApi,
-    queues: QueueApi,
-    users: UserApi,
-    vhosts: VhostApi,
+    pub bindings: BindingApi,
+    pub connections: ConnectionApi,
+    pub exchanges: ExchangeApi,
+    pub nodes: NodeApi,
+    pub overview: OverviewApi,
+    pub permissions: PermissionApi,
+    pub policies: PolicyApi,
+    pub queues: QueueApi,
+    pub users: UserApi,
+    pub vhosts: VhostApi,
 }
 
 pub struct RabbitMqClientBuilder {

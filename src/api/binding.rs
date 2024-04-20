@@ -36,10 +36,10 @@ impl BindingApi {
 
 #[derive(Debug, Deserialize)]
 pub struct RabbitMqBinding {
-    source: String,
-    vhost: String,
-    destination: String,
-    destination_type: String,
-    routing_key: String,
-    properties_key: String,
+    pub source: String,
+    pub vhost: String,
+    pub destination: String,
+    pub destination_type: String,
+    pub routing_key: String,
+    pub properties_key: String,
 }

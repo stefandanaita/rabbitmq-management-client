@@ -112,11 +112,11 @@ impl PermissionApi {
 
 #[derive(Debug, Deserialize)]
 pub struct RabbitMqPermission {
-    vhost: String,
-    user: String,
-    configure: String,
-    write: String,
-    read: String,
+    pub vhost: String,
+    pub user: String,
+    pub configure: String,
+    pub write: String,
+    pub read: String,
 }
 
 #[derive(Debug, Deserialize)]

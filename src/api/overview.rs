@@ -59,68 +59,68 @@ impl OverviewApi {
 
 #[derive(Debug, Deserialize)]
 pub struct RabbitMqOverview {
-    management_version: String,
-    rates_mode: String,
-    exchange_types: Vec<RabbitMqExchangeType>,
-    product_version: String,
-    product_name: String,
-    rabbitmq_version: String,
-    cluster_name: String,
-    erlang_version: String,
-    erlang_full_version: String,
-    release_series_support_status: String,
-    disable_stats: bool,
-    is_op_policy_updating_enabled: bool,
-    enable_queue_totals: bool,
-    churn_rates: RabbitMqChurnRates,
-    object_totals: RabbitMqObjectTotals,
-    listeners: Vec<RabbitMqListener>,
-    contexts: Vec<RabbitMqContext>,
+    pub management_version: String,
+    pub rates_mode: String,
+    pub exchange_types: Vec<RabbitMqExchangeType>,
+    pub product_version: String,
+    pub product_name: String,
+    pub rabbitmq_version: String,
+    pub cluster_name: String,
+    pub erlang_version: String,
+    pub erlang_full_version: String,
+    pub release_series_support_status: String,
+    pub disable_stats: bool,
+    pub is_op_policy_updating_enabled: bool,
+    pub enable_queue_totals: bool,
+    pub churn_rates: RabbitMqChurnRates,
+    pub object_totals: RabbitMqObjectTotals,
+    pub listeners: Vec<RabbitMqListener>,
+    pub contexts: Vec<RabbitMqContext>,
 }
 
 #[derive(Debug, Deserialize)]
 pub struct RabbitMqExchangeType {
-    name: String,
-    description: String,
-    enabled: bool,
+    pub name: String,
+    pub description: String,
+    pub enabled: bool,
 }
 
 #[derive(Debug, Deserialize)]
 pub struct RabbitMqContext {
-    node: Option<String>,
-    description: String,
-    path: String,
-    cowboy_opts: String,
-    port: String,
-    protocol: Option<String>,
+    pub node: Option<String>,
+    pub description: String,
+    pub path: String,
+    pub cowboy_opts: String,
+    pub port: String,
+    pub protocol: Option<String>,
 }
 
 #[derive(Debug, Deserialize)]
 pub struct RabbitMqListener {
-    node: String,
-    protocol: String,
-    ip_address: String,
-    port: i64,
+    pub node: String,
+    pub protocol: String,
+    pub ip_address: String,
+    pub port: i64,
 }
 
 #[derive(Debug, Deserialize)]
 pub struct RabbitMqChurnRates {
-    channel_closed: i64,
-    channel_created: i64,
-    connection_closed: i64,
-    connection_created: i64,
-    queue_created: i64,
-    queue_declared: i64,
-    queue_deleted: i64,
+    pub channel_closed: i64,
+    pub channel_created: i64,
+    pub connection_closed: i64,
+    pub connection_created: i64,
+    pub queue_created: i64,
+    pub queue_declared: i64,
+    pub queue_deleted: i64,
 }
 
 #[derive(Debug, Deserialize)]
 pub struct RabbitMqObjectTotals {
-    channels: i64,
-    connections: i64,
-    consumers: i64,
-    exchanges: i64,
-    queues: i64,
+    pub channels: i64,
+    pub connections: i64,
+    pub consumers: i64,
+    pub exchanges: i64,
+    pub queues: i64,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
