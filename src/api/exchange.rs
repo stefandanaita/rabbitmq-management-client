@@ -2,7 +2,8 @@ use crate::api::_generic::handle_response;
 use crate::errors::RabbitMqClientError;
 use reqwest_middleware::ClientWithMiddleware;
 use serde::{Deserialize, Serialize};
-use crate::api::policy::{RabbitMqPolicy, RabbitMqPolicyRequest};
+use std::collections::HashMap;
+use crate::api::binding::RabbitMqBinding;
 
 pub struct ExchangeApi {
     client: ClientWithMiddleware,
@@ -41,7 +42,10 @@ impl ExchangeApi {
             .client
             .request(
                 reqwest::Method::GET,
-                format!("http://localhost:15672/api/exchanges/{}/{}", vhost, exchange),
+                format!(
+                    "http://localhost:15672/api/exchanges/{}/{}",
+                    vhost, exchange
+                ),
             )
             .send()
             .await?;
@@ -76,7 +80,10 @@ impl ExchangeApi {
             .client
             .request(
                 reqwest::Method::PUT,
-                format!("http://localhost:15672/api/exchanges/{}/{}", vhost, exchange),
+                format!(
+                    "http://localhost:15672/api/exchanges/{}/{}",
+                    vhost, exchange
+                ),
             )
             .json(&body)
             .send()
@@ -85,16 +92,73 @@ impl ExchangeApi {
         handle_response(response).await
     }
 
-    pub async fn delete_policy(
+    pub async fn delete_exchange(
         &self,
         vhost: String,
-        policy: String,
+        exchange: String,
     ) -> Result<(), RabbitMqClientError> {
         let response = self
             .client
             .request(
                 reqwest::Method::DELETE,
-                format!("http://localhost:15672/api/policies/{}/{}", vhost, policy),
+                format!(
+                    "http://localhost:15672/api/exchanges/{}/{}",
+                    vhost, exchange
+                ),
+            )
+            .send()
+            .await?;
+
+        handle_response(response).await
+    }
+
+    pub async fn publish_message(
+        &self,
+        vhost: String,
+        exchange: String,
+        body: RabbitMqExchangeMessagePublishRequest,
+    ) -> Result<RabbitMqExchangeMessagePublishResponse, RabbitMqClientError> {
+        let response = self
+            .client
+            .request(
+                reqwest::Method::POST,
+                format!(
+                    "http://localhost:15672/api/exchanges/{}/{}/publish",
+                    vhost, exchange
+                ),
+            )
+            .json(&body)
+            .send()
+            .await?;
+
+        handle_response(response).await
+    }
+
+    pub async fn list_source_bindings(&self, vhost: String, exchange: String) -> Result<Vec<RabbitMqBinding>, RabbitMqClientError> {
+        let response = self
+            .client
+            .request(
+                reqwest::Method::GET,
+                format!(
+                    "http://localhost:15672/api/exchanges/{}/{}/bindings/source",
+                    vhost, exchange
+                ),
+            )
+            .send()
+            .await?;
+
+        handle_response(response).await
+    }
+
+    pub async fn list_destination_bindings(&self, vhost: String, exchange: String) -> Result<Vec<RabbitMqBinding>, RabbitMqClientError> {
+        let response = self
+            .client
+            .request(
+                reqwest::Method::GET,
+                format!(
+                    "http://localhost:15672/api/exchanges/{}/{}/bindings/destination",
+                    vhost, exchange
+                ),
             )
             .send()
             .await?;
@@ -113,6 +177,13 @@ pub struct RabbitMqExchange {
     kind: String,
     user_who_performed_action: String,
     vhost: String,
+    message_stats: Option<RabbitMqExchangeMessageStats>,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct RabbitMqExchangeMessageStats {
+    publish_in: i64,
+    publish_out: i64,
 }
 
 #[derive(Debug, Serialize)]
@@ -122,4 +193,25 @@ pub struct RabbitMqExchangeRequest {
     auto_delete: Option<bool>,
     durable: Option<bool>,
     internal: Option<bool>,
+}
+
+#[derive(Debug, Serialize)]
+pub struct RabbitMqExchangeMessagePublishRequest {
+    properties: HashMap<String, String>,
+    routing_key: String,
+    payload: String,
+    payload_encoding: RabbitMqMessageEncoding,
+}
+
+#[derive(Debug, Serialize)]
+pub enum RabbitMqMessageEncoding {
+    #[serde(rename = "string")]
+    String,
+    #[serde(rename = "base64")]
+    Base64,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct RabbitMqExchangeMessagePublishResponse {
+    routed: bool,
 }
