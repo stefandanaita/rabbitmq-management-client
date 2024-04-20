@@ -5,18 +5,19 @@ use reqwest_middleware::ClientWithMiddleware;
 use serde::{Deserialize, Serialize};
 
 pub struct UserApi {
+    api_url: String,
     client: ClientWithMiddleware,
 }
 
 impl UserApi {
-    pub fn new(client: ClientWithMiddleware) -> Self {
-        Self { client }
+    pub fn new(api_url: String, client: ClientWithMiddleware) -> Self {
+        Self { api_url, client }
     }
 
     pub async fn who_am_i(&self) -> Result<RabbitMqWhoAmI, RabbitMqClientError> {
         let response = self
             .client
-            .request(reqwest::Method::GET, "http://localhost:15672/api/whoami")
+            .request(reqwest::Method::GET, format!("{}/api/whoami", self.api_url))
             .send()
             .await?;
 
@@ -26,7 +27,7 @@ impl UserApi {
     pub async fn list_users(&self) -> Result<Vec<RabbitMqUser>, RabbitMqClientError> {
         let response = self
             .client
-            .request(reqwest::Method::GET, "http://localhost:15672/api/users")
+            .request(reqwest::Method::GET, format!("{}/api/users", self.api_url))
             .send()
             .await?;
 
@@ -40,7 +41,7 @@ impl UserApi {
             .client
             .request(
                 reqwest::Method::GET,
-                "http://localhost:15672/api/users/without-permissions",
+                format!("{}/api/users/without-permissions", self.api_url),
             )
             .send()
             .await?;
@@ -56,7 +57,7 @@ impl UserApi {
             .client
             .request(
                 reqwest::Method::DELETE,
-                "http://localhost:15672/api/users/bulk-delete",
+                format!("{}/api/users/bulk-delete", self.api_url),
             )
             .json(&users)
             .send()
@@ -73,7 +74,7 @@ impl UserApi {
             .client
             .request(
                 reqwest::Method::DELETE,
-                format!("http://localhost:15672/api/users/{}/permissions", user),
+                format!("{}/api/users/{}/permissions", self.api_url, user),
             )
             .send()
             .await?;
@@ -89,10 +90,7 @@ impl UserApi {
             .client
             .request(
                 reqwest::Method::DELETE,
-                format!(
-                    "http://localhost:15672/api/users/{}/topic-permissions",
-                    user
-                ),
+                format!("{}/api/users/{}/topic-permissions", self.api_url, user),
             )
             .send()
             .await?;

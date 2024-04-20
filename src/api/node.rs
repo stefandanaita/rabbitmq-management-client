@@ -5,18 +5,19 @@ use reqwest_middleware::ClientWithMiddleware;
 use serde::Deserialize;
 
 pub struct NodeApi {
+    api_url: String,
     client: ClientWithMiddleware,
 }
 
 impl NodeApi {
-    pub fn new(client: ClientWithMiddleware) -> Self {
-        Self { client }
+    pub fn new(api_url: String, client: ClientWithMiddleware) -> Self {
+        Self { api_url, client }
     }
 
     pub async fn list_nodes(&self) -> Result<Vec<RabbitMqNode>, RabbitMqClientError> {
         let response = self
             .client
-            .request(reqwest::Method::GET, "http://localhost:15672/api/nodes")
+            .request(reqwest::Method::GET, format!("{}/api/nodes", self.api_url))
             .send()
             .await?;
 
@@ -28,7 +29,7 @@ impl NodeApi {
             .client
             .request(
                 reqwest::Method::GET,
-                format!("http://localhost:15672/api/nodes/{}", node),
+                format!("{}/api/nodes/{}", self.api_url, node),
             )
             .send()
             .await?;
@@ -38,13 +39,13 @@ impl NodeApi {
 
     pub async fn get_node_memory(
         &self,
-        node_name: String,
+        node: String,
     ) -> Result<RabbitMqNodeMemory, RabbitMqClientError> {
         let response = self
             .client
             .request(
                 reqwest::Method::GET,
-                format!("http://localhost:15672/api/nodes/{}/memory", node_name),
+                format!("{}/api/nodes/{}/memory", self.api_url, node),
             )
             .send()
             .await?;

@@ -6,6 +6,8 @@ pub enum RabbitMqClientError {
     Unauthorized,
     #[error("Resource already exists: {0}")]
     AlreadyExists(String),
+    #[error("Invalid RabbitMq API url: {0}")]
+    InvalidApiUrl(String),
     #[error("Failed to parse the API response: {0}")]
     ParsingError(#[source] reqwest::Error),
     #[error("Failed to execute the middleware: {0}")]

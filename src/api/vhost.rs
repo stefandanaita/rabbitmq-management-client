@@ -6,18 +6,19 @@ use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
 pub struct VhostApi {
+    api_url: String,
     client: ClientWithMiddleware,
 }
 
 impl VhostApi {
-    pub fn new(client: ClientWithMiddleware) -> Self {
-        Self { client }
+    pub fn new(api_url: String, client: ClientWithMiddleware) -> Self {
+        Self { api_url, client }
     }
 
     pub async fn list_vhosts(&self) -> Result<Vec<RabbitMqVhost>, RabbitMqClientError> {
         let response = self
             .client
-            .request(reqwest::Method::GET, "http://localhost:15672/api/vhosts")
+            .request(reqwest::Method::GET, format!("{}/api/vhosts", self.api_url))
             .send()
             .await?;
 
@@ -54,7 +55,7 @@ impl VhostApi {
             .client
             .request(
                 reqwest::Method::DELETE,
-                format!("http://localhost:15672/api/vhosts/{}", request.name),
+                format!("{}/api/vhosts/{}", self.api_url, request.name),
             )
             .json(&RequestBody {
                 description: request.description,
@@ -72,7 +73,7 @@ impl VhostApi {
             .client
             .request(
                 reqwest::Method::DELETE,
-                format!("http://localhost:15672/api/vhosts/{}", vhost),
+                format!("{}/api/vhosts/{}", self.api_url, vhost),
             )
             .send()
             .await?;
@@ -89,7 +90,7 @@ impl VhostApi {
             .client
             .request(
                 reqwest::Method::POST,
-                format!("http://localhost:15672/api/vhosts/{}/start/{}", vhost, node),
+                format!("{}/api/vhosts/{}/start/{}", self.api_url, vhost, node),
             )
             .send()
             .await?;
@@ -105,7 +106,7 @@ impl VhostApi {
             .client
             .request(
                 reqwest::Method::GET,
-                format!("http://localhost:15672/api/vhosts/{}/permissions", vhost),
+                format!("{}/api/vhosts/{}/permissions", self.api_url, vhost),
             )
             .send()
             .await?;
@@ -121,10 +122,7 @@ impl VhostApi {
             .client
             .request(
                 reqwest::Method::GET,
-                format!(
-                    "http://localhost:15672/api/vhosts/{}/topic-permissions",
-                    vhost
-                ),
+                format!("{}/api/vhosts/{}/topic-permissions", self.api_url, vhost),
             )
             .send()
             .await?;

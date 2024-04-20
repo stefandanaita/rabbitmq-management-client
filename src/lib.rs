@@ -8,6 +8,7 @@ mod errors;
 mod middlewares;
 
 pub struct RabbitMqClient {
+    pub api_url: String,
     pub client: ClientWithMiddleware,
 }
 
@@ -30,15 +31,13 @@ impl RabbitMqClientBuilder {
     }
 
     pub fn build(self) -> Result<RabbitMqClient, RabbitMqClientError> {
-        let client: ClientWithMiddleware = match self.preset_client {
-            None => self.new_client(),
-            Some(c) => c,
-        };
+        let client: ClientWithMiddleware = self
+            .preset_client
+            .unwrap_or_else(|| ClientBuilder::new(reqwest::Client::new()).build());
 
-        Ok(RabbitMqClient { client })
-    }
-
-    fn new_client(self) -> ClientWithMiddleware {
-        ClientBuilder::new(reqwest::Client::new()).build()
+        Ok(RabbitMqClient {
+            client,
+            api_url: self.config.rabbitmq_api_url,
+        })
     }
 }

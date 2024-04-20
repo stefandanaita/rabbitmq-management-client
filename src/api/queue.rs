@@ -7,12 +7,13 @@ use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
 pub struct QueueApi {
+    api_url: String,
     client: ClientWithMiddleware,
 }
 
 impl QueueApi {
-    pub fn new(client: ClientWithMiddleware) -> Self {
-        Self { client }
+    pub fn new(api_url: String, client: ClientWithMiddleware) -> Self {
+        Self { api_url, client }
     }
 
     pub async fn list_queues(
@@ -23,10 +24,7 @@ impl QueueApi {
             .client
             .request(
                 reqwest::Method::GET,
-                format!(
-                    "http://localhost:15672/api/queues/{}",
-                    vhost.unwrap_or_default()
-                ),
+                format!("{}/api/queues/{}", self.api_url, vhost.unwrap_or_default()),
             )
             .send()
             .await?;
@@ -43,7 +41,7 @@ impl QueueApi {
             .client
             .request(
                 reqwest::Method::GET,
-                format!("http://localhost:15672/api/queues/{}/{}", vhost, name),
+                format!("{}/api/queues/{}/{}", self.api_url, vhost, name),
             )
             .send()
             .await?;
@@ -60,10 +58,7 @@ impl QueueApi {
             .client
             .request(
                 reqwest::Method::GET,
-                format!(
-                    "http://localhost:15672/api/queues/{}/{}/definitions",
-                    vhost, name
-                ),
+                format!("{}/api/queues/{}/{}/definitions", self.api_url, vhost, name),
             )
             .send()
             .await?;
@@ -80,7 +75,7 @@ impl QueueApi {
             .client
             .request(
                 reqwest::Method::DELETE,
-                format!("http://localhost:15672/api/queues/{}/{}", vhost, name),
+                format!("{}/api/queues/{}/{}", self.api_url, vhost, name),
             )
             .send()
             .await?;
@@ -97,10 +92,7 @@ impl QueueApi {
             .client
             .request(
                 reqwest::Method::DELETE,
-                format!(
-                    "http://localhost:15672/api/queues/{}/{}/contents",
-                    vhost, name
-                ),
+                format!("{}/api/queues/{}/{}/contents", self.api_url, vhost, name),
             )
             .send()
             .await?;
@@ -118,10 +110,7 @@ impl QueueApi {
             .client
             .request(
                 reqwest::Method::POST,
-                format!(
-                    "http://localhost:15672/api/queues/{}/{}/actions",
-                    vhost, queue
-                ),
+                format!("{}/api/queues/{}/{}/actions", self.api_url, vhost, queue),
             )
             .json(&actions)
             .send()

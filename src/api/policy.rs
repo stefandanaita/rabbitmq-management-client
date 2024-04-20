@@ -5,12 +5,13 @@ use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
 pub struct PolicyApi {
+    api_url: String,
     client: ClientWithMiddleware,
 }
 
 impl PolicyApi {
-    pub fn new(client: ClientWithMiddleware) -> Self {
-        Self { client }
+    pub fn new(api_url: String, client: ClientWithMiddleware) -> Self {
+        Self { api_url, client }
     }
 
     pub async fn list_policies(
@@ -22,7 +23,8 @@ impl PolicyApi {
             .request(
                 reqwest::Method::GET,
                 format!(
-                    "http://localhost:15672/api/policies/{}",
+                    "{}/api/policies/{}",
+                    self.api_url,
                     vhost.unwrap_or_default()
                 ),
             )
@@ -41,7 +43,7 @@ impl PolicyApi {
             .client
             .request(
                 reqwest::Method::GET,
-                format!("http://localhost:15672/api/policies/{}/{}", vhost, policy),
+                format!("{}/api/policies/{}/{}", self.api_url, vhost, policy),
             )
             .send()
             .await?;
@@ -53,7 +55,7 @@ impl PolicyApi {
         &self,
         vhost: String,
         policy: String,
-        body: RabbitMqPolicyRequest,
+        request: RabbitMqPolicyRequest,
     ) -> Result<(), RabbitMqClientError> {
         let policies = self.list_policies(Some(vhost.clone())).await?;
         if let Some(existing) = policies.iter().find(|v| v.name == policy) {
@@ -63,22 +65,22 @@ impl PolicyApi {
             )));
         }
 
-        self.update_policy(vhost, policy, body).await
+        self.update_policy(vhost, policy, request).await
     }
 
     pub async fn update_policy(
         &self,
         vhost: String,
         policy: String,
-        body: RabbitMqPolicyRequest,
+        request: RabbitMqPolicyRequest,
     ) -> Result<(), RabbitMqClientError> {
         let response = self
             .client
             .request(
                 reqwest::Method::PUT,
-                format!("http://localhost:15672/api/policies/{}/{}", vhost, policy),
+                format!("{}/api/policies/{}/{}", self.api_url, vhost, policy),
             )
-            .json(&body)
+            .json(&request)
             .send()
             .await?;
 
@@ -94,7 +96,7 @@ impl PolicyApi {
             .client
             .request(
                 reqwest::Method::DELETE,
-                format!("http://localhost:15672/api/policies/{}/{}", vhost, policy),
+                format!("{}/api/policies/{}/{}", self.api_url, vhost, policy),
             )
             .send()
             .await?;

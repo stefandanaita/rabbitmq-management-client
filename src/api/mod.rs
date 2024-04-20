@@ -1,6 +1,7 @@
 mod _generic;
 mod binding;
 mod cluster_name;
+mod connection;
 mod exchange;
 mod node;
 mod overview;

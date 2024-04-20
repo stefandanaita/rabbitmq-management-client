@@ -4,12 +4,13 @@ use reqwest_middleware::ClientWithMiddleware;
 use serde::{Deserialize, Serialize};
 
 pub struct ClusterNameApi {
+    api_url: String,
     client: ClientWithMiddleware,
 }
 
 impl ClusterNameApi {
-    pub fn new(client: ClientWithMiddleware) -> Self {
-        Self { client }
+    pub fn new(api_url: String, client: ClientWithMiddleware) -> Self {
+        Self { api_url, client }
     }
 
     pub async fn get_cluster_name(&self) -> Result<RabbitMqClusterName, RabbitMqClientError> {
@@ -17,7 +18,7 @@ impl ClusterNameApi {
             .client
             .request(
                 reqwest::Method::GET,
-                "http://localhost:15672/api/cluster-name",
+                format!("{}/api/cluster-name", self.api_url),
             )
             .send()
             .await?;
@@ -27,15 +28,15 @@ impl ClusterNameApi {
 
     pub async fn set_cluster_name(
         &self,
-        body: RabbitMqClusterName,
+        request: RabbitMqClusterName,
     ) -> Result<(), RabbitMqClientError> {
         let response = self
             .client
             .request(
                 reqwest::Method::PUT,
-                "http://localhost:15672/api/cluster-name",
+                format!("{}/api/cluster-name", self.api_url),
             )
-            .json(&body)
+            .json(&request)
             .send()
             .await?;
 

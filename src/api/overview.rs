@@ -4,18 +4,22 @@ use reqwest_middleware::ClientWithMiddleware;
 use serde::Deserialize;
 
 pub struct OverviewApi {
+    api_url: String,
     client: ClientWithMiddleware,
 }
 
 impl OverviewApi {
-    pub fn new(client: ClientWithMiddleware) -> Self {
-        Self { client }
+    pub fn new(api_url: String, client: ClientWithMiddleware) -> Self {
+        Self { api_url, client }
     }
 
     pub async fn get_overview(&self) -> Result<RabbitMqOverview, RabbitMqClientError> {
         let response = self
             .client
-            .request(reqwest::Method::GET, "http://localhost:15672/api/overview")
+            .request(
+                reqwest::Method::GET,
+                format!("{}/api/overview", self.api_url),
+            )
             .send()
             .await?;
 

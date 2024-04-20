@@ -4,12 +4,13 @@ use reqwest_middleware::ClientWithMiddleware;
 use serde::Deserialize;
 
 pub struct PermissionApi {
+    api_url: String,
     client: ClientWithMiddleware,
 }
 
 impl PermissionApi {
-    pub fn new(client: ClientWithMiddleware) -> Self {
-        Self { client }
+    pub fn new(api_url: String, client: ClientWithMiddleware) -> Self {
+        Self { api_url, client }
     }
 
     pub async fn list_permissions(&self) -> Result<Vec<RabbitMqPermission>, RabbitMqClientError> {
@@ -17,7 +18,7 @@ impl PermissionApi {
             .client
             .request(
                 reqwest::Method::GET,
-                "http://localhost:15672/api/permissions",
+                format!("{}/api/permissions", self.api_url),
             )
             .send()
             .await?;
@@ -34,7 +35,7 @@ impl PermissionApi {
             .client
             .request(
                 reqwest::Method::GET,
-                format!("http://localhost:15672/api/permissions/{}/{}", vhost, user),
+                format!("{}/api/permissions/{}/{}", self.api_url, vhost, user),
             )
             .send()
             .await?;
@@ -51,7 +52,7 @@ impl PermissionApi {
             .client
             .request(
                 reqwest::Method::DELETE,
-                format!("http://localhost:15672/api/permissions/{}/{}", vhost, user),
+                format!("{}/api/permissions/{}/{}", self.api_url, vhost, user),
             )
             .send()
             .await?;
@@ -66,7 +67,7 @@ impl PermissionApi {
             .client
             .request(
                 reqwest::Method::GET,
-                "http://localhost:15672/api/topic-permissions",
+                format!("{}/api/topic-permissions", self.api_url),
             )
             .send()
             .await?;
@@ -83,10 +84,7 @@ impl PermissionApi {
             .client
             .request(
                 reqwest::Method::GET,
-                format!(
-                    "http://localhost:15672/api/topic-permissions/{}/{}",
-                    vhost, user
-                ),
+                format!("{}/api/topic-permissions/{}/{}", self.api_url, vhost, user),
             )
             .send()
             .await?;
@@ -103,10 +101,7 @@ impl PermissionApi {
             .client
             .request(
                 reqwest::Method::DELETE,
-                format!(
-                    "http://localhost:15672/api/topic-permissions/{}/{}",
-                    vhost, user
-                ),
+                format!("{}/api/topic-permissions/{}/{}", self.api_url, vhost, user),
             )
             .send()
             .await?;

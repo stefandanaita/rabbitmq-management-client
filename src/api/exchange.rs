@@ -1,17 +1,18 @@
 use crate::api::_generic::handle_response;
+use crate::api::binding::RabbitMqBinding;
 use crate::errors::RabbitMqClientError;
 use reqwest_middleware::ClientWithMiddleware;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
-use crate::api::binding::RabbitMqBinding;
 
 pub struct ExchangeApi {
+    api_url: String,
     client: ClientWithMiddleware,
 }
 
 impl ExchangeApi {
-    pub fn new(client: ClientWithMiddleware) -> Self {
-        Self { client }
+    pub fn new(api_url: String, client: ClientWithMiddleware) -> Self {
+        Self { api_url, client }
     }
 
     pub async fn list_exchanges(
@@ -23,7 +24,8 @@ impl ExchangeApi {
             .request(
                 reqwest::Method::GET,
                 format!(
-                    "http://localhost:15672/api/exchanges/{}",
+                    "{}/api/exchanges/{}",
+                    self.api_url,
                     vhost.unwrap_or_default()
                 ),
             )
@@ -42,10 +44,7 @@ impl ExchangeApi {
             .client
             .request(
                 reqwest::Method::GET,
-                format!(
-                    "http://localhost:15672/api/exchanges/{}/{}",
-                    vhost, exchange
-                ),
+                format!("{}/api/exchanges/{}/{}", self.api_url, vhost, exchange),
             )
             .send()
             .await?;
@@ -57,9 +56,9 @@ impl ExchangeApi {
         &self,
         vhost: String,
         exchange: String,
-        body: RabbitMqExchangeRequest,
+        request: RabbitMqExchangeRequest,
     ) -> Result<(), RabbitMqClientError> {
-        let exchanges = self.list_policies(Some(vhost.clone())).await?;
+        let exchanges = self.list_exchanges(Some(vhost.clone())).await?;
         if let Some(existing) = exchanges.iter().find(|v| v.name == exchange) {
             return Err(RabbitMqClientError::AlreadyExists(format!(
                 "{} policy",
@@ -67,25 +66,22 @@ impl ExchangeApi {
             )));
         }
 
-        self.update_exchange(vhost, exchange, body).await
+        self.update_exchange(vhost, exchange, request).await
     }
 
     pub async fn update_exchange(
         &self,
         vhost: String,
         exchange: String,
-        body: RabbitMqExchangeRequest,
+        request: RabbitMqExchangeRequest,
     ) -> Result<(), RabbitMqClientError> {
         let response = self
             .client
             .request(
                 reqwest::Method::PUT,
-                format!(
-                    "http://localhost:15672/api/exchanges/{}/{}",
-                    vhost, exchange
-                ),
+                format!("{}/api/exchanges/{}/{}", self.api_url, vhost, exchange),
             )
-            .json(&body)
+            .json(&request)
             .send()
             .await?;
 
@@ -101,10 +97,7 @@ impl ExchangeApi {
             .client
             .request(
                 reqwest::Method::DELETE,
-                format!(
-                    "http://localhost:15672/api/exchanges/{}/{}",
-                    vhost, exchange
-                ),
+                format!("{}/api/exchanges/{}/{}", self.api_url, vhost, exchange),
             )
             .send()
             .await?;
@@ -116,32 +109,36 @@ impl ExchangeApi {
         &self,
         vhost: String,
         exchange: String,
-        body: RabbitMqExchangeMessagePublishRequest,
+        request: RabbitMqExchangeMessagePublishRequest,
     ) -> Result<RabbitMqExchangeMessagePublishResponse, RabbitMqClientError> {
         let response = self
             .client
             .request(
                 reqwest::Method::POST,
                 format!(
-                    "http://localhost:15672/api/exchanges/{}/{}/publish",
-                    vhost, exchange
+                    "{}/api/exchanges/{}/{}/publish",
+                    self.api_url, vhost, exchange
                 ),
             )
-            .json(&body)
+            .json(&request)
             .send()
             .await?;
 
         handle_response(response).await
     }
 
-    pub async fn list_source_bindings(&self, vhost: String, exchange: String) -> Result<Vec<RabbitMqBinding>, RabbitMqClientError> {
+    pub async fn list_source_bindings(
+        &self,
+        vhost: String,
+        exchange: String,
+    ) -> Result<Vec<RabbitMqBinding>, RabbitMqClientError> {
         let response = self
             .client
             .request(
                 reqwest::Method::GET,
                 format!(
-                    "http://localhost:15672/api/exchanges/{}/{}/bindings/source",
-                    vhost, exchange
+                    "{}/api/exchanges/{}/{}/bindings/source",
+                    self.api_url, vhost, exchange
                 ),
             )
             .send()
@@ -150,14 +147,18 @@ impl ExchangeApi {
         handle_response(response).await
     }
 
-    pub async fn list_destination_bindings(&self, vhost: String, exchange: String) -> Result<Vec<RabbitMqBinding>, RabbitMqClientError> {
+    pub async fn list_destination_bindings(
+        &self,
+        vhost: String,
+        exchange: String,
+    ) -> Result<Vec<RabbitMqBinding>, RabbitMqClientError> {
         let response = self
             .client
             .request(
                 reqwest::Method::GET,
                 format!(
-                    "http://localhost:15672/api/exchanges/{}/{}/bindings/destination",
-                    vhost, exchange
+                    "{}/api/exchanges/{}/{}/bindings/destination",
+                    self.api_url, vhost, exchange
                 ),
             )
             .send()

@@ -4,12 +4,13 @@ use reqwest_middleware::ClientWithMiddleware;
 use serde::Deserialize;
 
 pub struct BindingApi {
+    api_url: String,
     client: ClientWithMiddleware,
 }
 
 impl BindingApi {
-    pub fn new(client: ClientWithMiddleware) -> Self {
-        Self { client }
+    pub fn new(api_url: String, client: ClientWithMiddleware) -> Self {
+        Self { api_url, client }
     }
 
     pub async fn list_bindings(
@@ -21,7 +22,8 @@ impl BindingApi {
             .request(
                 reqwest::Method::GET,
                 format!(
-                    "http://localhost:15672/api/bindings/{}",
+                    "{}/api/bindings/{}",
+                    self.api_url,
                     vhost.unwrap_or_default()
                 ),
             )
