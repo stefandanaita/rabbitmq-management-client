@@ -25,6 +25,19 @@ impl VhostApi {
         handle_response(response).await
     }
 
+    pub async fn get_vhost(
+        &self,
+        vhost: String,
+    ) -> Result<RabbitMqVhost, RabbitMqClientError> {
+        let response = self
+            .client
+            .request(reqwest::Method::GET, format!("{}/api/vhosts/{}", self.api_url, vhost))
+            .send()
+            .await?;
+
+        handle_response(response).await
+    }
+
     pub async fn create_vhost(
         &self,
         request: RabbitMqVhostRequest,

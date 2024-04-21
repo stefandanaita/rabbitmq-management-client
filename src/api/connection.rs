@@ -16,7 +16,7 @@ impl ConnectionApi {
     pub async fn list_connections(
         &self,
         vhost: Option<String>,
-    ) -> Result<RabbitMqConnection, RabbitMqClientError> {
+    ) -> Result<Vec<RabbitMqConnection>, RabbitMqClientError> {
         let endpoint = match vhost {
             None => format!("{}/api/connections", self.api_url),
             Some(vhost) => format!("{}/api/vhosts/{}/connections", self.api_url, vhost),
