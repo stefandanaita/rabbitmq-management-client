@@ -1,8 +1,8 @@
 use async_trait::async_trait;
+use base64::{engine::general_purpose, Engine as _};
 use http::HeaderValue;
 use reqwest::{Request, Response};
 use reqwest_middleware::{Middleware, Next};
-use base64::{Engine as _, engine::{general_purpose}};
 
 pub struct AuthenticationMiddleware {
     pub username: String,
@@ -17,7 +17,8 @@ impl Middleware for AuthenticationMiddleware {
         extensions: &mut http::Extensions,
         next: Next<'_>,
     ) -> reqwest_middleware::Result<Response> {
-        let creds = general_purpose::STANDARD.encode(format!("{}:{}", self.username, self.password));
+        let creds =
+            general_purpose::STANDARD.encode(format!("{}:{}", self.username, self.password));
 
         let mut header_value = HeaderValue::from_str(format!("Basic {}", creds).as_str())
             .map_err(|e| reqwest_middleware::Error::Middleware(e.into()))?;

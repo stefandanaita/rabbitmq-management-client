@@ -5,6 +5,7 @@ use reqwest_middleware::ClientWithMiddleware;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
+#[derive(Debug, Clone)]
 pub struct VhostApi {
     api_url: String,
     client: ClientWithMiddleware,
@@ -25,13 +26,13 @@ impl VhostApi {
         handle_response(response).await
     }
 
-    pub async fn get_vhost(
-        &self,
-        vhost: String,
-    ) -> Result<RabbitMqVhost, RabbitMqClientError> {
+    pub async fn get_vhost(&self, vhost: String) -> Result<RabbitMqVhost, RabbitMqClientError> {
         let response = self
             .client
-            .request(reqwest::Method::GET, format!("{}/api/vhosts/{}", self.api_url, vhost))
+            .request(
+                reqwest::Method::GET,
+                format!("{}/api/vhosts/{}", self.api_url, vhost),
+            )
             .send()
             .await?;
 

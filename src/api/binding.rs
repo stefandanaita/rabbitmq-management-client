@@ -3,6 +3,7 @@ use crate::errors::RabbitMqClientError;
 use reqwest_middleware::ClientWithMiddleware;
 use serde::Deserialize;
 
+#[derive(Debug, Clone)]
 pub struct BindingApi {
     api_url: String,
     client: ClientWithMiddleware,

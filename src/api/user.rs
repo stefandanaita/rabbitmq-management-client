@@ -4,6 +4,7 @@ use crate::errors::RabbitMqClientError;
 use reqwest_middleware::ClientWithMiddleware;
 use serde::{Deserialize, Serialize};
 
+#[derive(Debug, Clone)]
 pub struct UserApi {
     api_url: String,
     client: ClientWithMiddleware,

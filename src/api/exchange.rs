@@ -5,6 +5,7 @@ use reqwest_middleware::ClientWithMiddleware;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
+#[derive(Debug, Clone)]
 pub struct ExchangeApi {
     api_url: String,
     client: ClientWithMiddleware,

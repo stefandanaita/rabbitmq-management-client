@@ -6,6 +6,7 @@ use reqwest_middleware::ClientWithMiddleware;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
+#[derive(Debug, Clone)]
 pub struct QueueApi {
     api_url: String,
     client: ClientWithMiddleware,

@@ -8,22 +8,24 @@ use crate::api::policy::PolicyApi;
 use crate::api::queue::QueueApi;
 use crate::api::user::UserApi;
 use crate::api::vhost::VhostApi;
-use crate::config::RabbitMqClientConfig;
+use crate::config::RabbitMqConfiguration;
 use crate::errors::RabbitMqClientError;
-use reqwest_middleware::{ClientBuilder, ClientWithMiddleware};
 use crate::middlewares::authentication::AuthenticationMiddleware;
+use reqwest_middleware::{ClientBuilder, ClientWithMiddleware};
 
-mod api;
+pub mod api;
 pub mod config;
 pub mod errors;
 mod middlewares;
 
+#[derive(Clone)]
 pub struct RabbitMqClient {
     pub api_url: String,
     pub client: ClientWithMiddleware,
     pub apis: RabbitMqApis,
 }
 
+#[derive(Clone)]
 pub struct RabbitMqApis {
     pub bindings: BindingApi,
     pub connections: ConnectionApi,
@@ -38,12 +40,12 @@ pub struct RabbitMqApis {
 }
 
 pub struct RabbitMqClientBuilder {
-    config: RabbitMqClientConfig,
+    config: RabbitMqConfiguration,
     preset_client: Option<ClientWithMiddleware>,
 }
 
 impl RabbitMqClientBuilder {
-    pub fn new(config: RabbitMqClientConfig) -> Self {
+    pub fn new(config: RabbitMqConfiguration) -> Self {
         Self {
             config,
             preset_client: None,
@@ -56,16 +58,14 @@ impl RabbitMqClientBuilder {
     }
 
     pub fn build(self) -> Result<RabbitMqClient, RabbitMqClientError> {
-        let client: ClientWithMiddleware = self
-            .preset_client
-            .unwrap_or_else(|| {
-                ClientBuilder::new(reqwest::Client::new())
-                    .with(AuthenticationMiddleware {
-                        username: self.config.rabbitmq_username,
-                        password: self.config.rabbitmq_password,
-                    })
-                    .build()
-            });
+        let client: ClientWithMiddleware = self.preset_client.unwrap_or_else(|| {
+            ClientBuilder::new(reqwest::Client::new())
+                .with(AuthenticationMiddleware {
+                    username: self.config.rabbitmq_username,
+                    password: self.config.rabbitmq_password,
+                })
+                .build()
+        });
 
         Ok(RabbitMqClient {
             apis: build_apis(self.config.rabbitmq_api_url.clone(), client.clone()),
