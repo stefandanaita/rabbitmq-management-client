@@ -25,7 +25,7 @@ where
         text: response
             .text()
             .await
-            .map_err(|e| RabbitMqClientError::ParsingError(e))?,
+            .map_err(RabbitMqClientError::ParsingError)?,
     }))
 }
 
@@ -45,6 +45,6 @@ pub async fn handle_empty_response(response: Response) -> Result<(), RabbitMqCli
         text: response
             .text()
             .await
-            .map_err(|e| RabbitMqClientError::ParsingError(e))?,
+            .map_err(RabbitMqClientError::ParsingError)?,
     }))
 }

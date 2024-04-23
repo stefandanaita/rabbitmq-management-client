@@ -8,6 +8,12 @@ pub struct TestContext {
     pub rabbitmq: RabbitMqClient,
 }
 
+impl Default for TestContext {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl TestContext {
     pub fn new() -> Self {
         let rmq = RabbitMqClientBuilder::new(test_config()).build().unwrap();
