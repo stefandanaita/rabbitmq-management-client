@@ -1,4 +1,4 @@
-use crate::api::_generic::handle_response;
+use crate::api::_generic::{handle_empty_response, handle_response};
 use crate::errors::RabbitMqClientError;
 use reqwest_middleware::ClientWithMiddleware;
 use serde::Deserialize;
@@ -58,7 +58,7 @@ impl PermissionApi {
             .send()
             .await?;
 
-        handle_response(response).await
+        handle_empty_response(response).await
     }
 
     pub async fn list_topic_permissions(
@@ -107,7 +107,7 @@ impl PermissionApi {
             .send()
             .await?;
 
-        handle_response(response).await
+        handle_empty_response(response).await
     }
 }
 

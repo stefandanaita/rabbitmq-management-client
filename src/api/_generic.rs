@@ -28,3 +28,23 @@ where
             .map_err(|e| RabbitMqClientError::ParsingError(e))?,
     }))
 }
+
+pub async fn handle_empty_response(response: Response) -> Result<(), RabbitMqClientError> {
+    let status = response.status();
+
+    if status.is_success() {
+        return Ok(());
+    }
+
+    if status.eq(&StatusCode::UNAUTHORIZED) {
+        return Err(RabbitMqClientError::Unauthorized);
+    }
+
+    Err(RabbitMqClientError::ApiError(RabbitMqApiError {
+        code: status,
+        text: response
+            .text()
+            .await
+            .map_err(|e| RabbitMqClientError::ParsingError(e))?,
+    }))
+}

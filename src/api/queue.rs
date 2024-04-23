@@ -1,4 +1,4 @@
-use crate::api::_generic::handle_response;
+use crate::api::_generic::{handle_empty_response, handle_response};
 use crate::api::binding::RabbitMqBinding;
 use crate::errors::RabbitMqClientError;
 use chrono::{DateTime, Utc};
@@ -81,7 +81,7 @@ impl QueueApi {
             .send()
             .await?;
 
-        handle_response(response).await
+        handle_empty_response(response).await
     }
 
     pub async fn purge_queue(
@@ -98,7 +98,7 @@ impl QueueApi {
             .send()
             .await?;
 
-        handle_response(response).await
+        handle_empty_response(response).await
     }
 
     pub async fn set_queue_actions(
@@ -117,7 +117,7 @@ impl QueueApi {
             .send()
             .await?;
 
-        handle_response(response).await
+        handle_empty_response(response).await
     }
 }
 

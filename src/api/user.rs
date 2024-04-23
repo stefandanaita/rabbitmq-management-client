@@ -1,4 +1,4 @@
-use crate::api::_generic::handle_response;
+use crate::api::_generic::{handle_empty_response, handle_response};
 use crate::api::permission::{RabbitMqPermission, RabbitMqTopicPermission};
 use crate::errors::RabbitMqClientError;
 use reqwest_middleware::ClientWithMiddleware;
@@ -64,7 +64,7 @@ impl UserApi {
             .send()
             .await?;
 
-        handle_response(response).await
+        handle_empty_response(response).await
     }
 
     pub async fn list_user_permissions(

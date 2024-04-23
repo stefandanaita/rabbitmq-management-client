@@ -1,4 +1,4 @@
-use crate::api::_generic::handle_response;
+use crate::api::_generic::{handle_empty_response, handle_response};
 use crate::api::binding::RabbitMqBinding;
 use crate::errors::RabbitMqClientError;
 use reqwest_middleware::ClientWithMiddleware;
@@ -86,7 +86,7 @@ impl ExchangeApi {
             .send()
             .await?;
 
-        handle_response(response).await
+        handle_empty_response(response).await
     }
 
     pub async fn delete_exchange(
@@ -103,7 +103,7 @@ impl ExchangeApi {
             .send()
             .await?;
 
-        handle_response(response).await
+        handle_empty_response(response).await
     }
 
     pub async fn publish_message(
