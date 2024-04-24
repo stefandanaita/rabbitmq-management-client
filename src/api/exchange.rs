@@ -62,7 +62,7 @@ impl ExchangeApi {
         let exchanges = self.list_exchanges(Some(vhost.clone())).await?;
         if let Some(existing) = exchanges.iter().find(|v| v.name == exchange) {
             return Err(RabbitMqClientError::AlreadyExists(format!(
-                "{} policy",
+                "{} exchange",
                 existing.name
             )));
         }
