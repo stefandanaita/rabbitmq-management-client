@@ -1,5 +1,5 @@
-use rabbitmq_management_client::api::overview::RabbitMqClusterName;
 use crate::context::TestContext;
+use rabbitmq_management_client::api::overview::RabbitMqClusterName;
 
 #[tokio::test]
 async fn can_get_cluster_overview() {
@@ -74,8 +74,5 @@ async fn can_list_nodes() {
         .expect("failed to get the list of nodes");
 
     assert_eq!(nodes.len(), 1);
-    assert_eq!(
-        nodes.first().unwrap().name,
-        "rabbit@rabbitmq"
-    );
+    assert_eq!(nodes.first().unwrap().name, "rabbit@rabbitmq");
 }
