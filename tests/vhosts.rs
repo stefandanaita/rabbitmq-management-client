@@ -1,6 +1,6 @@
-use rabbitmq_management_client::api::vhost::{RabbitMqVhostRequest};
-use rabbitmq_management_client::errors::RabbitMqClientError;
 use crate::context::TestContext;
+use rabbitmq_management_client::api::vhost::RabbitMqVhostRequest;
+use rabbitmq_management_client::errors::RabbitMqClientError;
 
 #[tokio::test]
 async fn can_list_vhosts() {
@@ -26,17 +26,13 @@ async fn can_crud_vhost() {
     let ctx = TestContext::new();
 
     // Create the vhost
-    ctx
-        .rabbitmq
+    ctx.rabbitmq
         .apis
         .vhosts
         .create_vhost(RabbitMqVhostRequest {
             name: "test-vhost".to_string(),
             description: Some("testing vhost".to_string()),
-            tags: vec![
-                "test1".to_string(),
-                "test2".to_string(),
-            ],
+            tags: vec!["test1".to_string(), "test2".to_string()],
             tracing: true,
         })
         .await
@@ -53,15 +49,14 @@ async fn can_crud_vhost() {
 
     assert_eq!(new_vhost.name, "test-vhost");
     assert_eq!(new_vhost.description, "testing vhost");
-    assert_eq!(new_vhost.tags, vec![
-        "test1".to_string(),
-        "test2".to_string(),
-    ]);
+    assert_eq!(
+        new_vhost.tags,
+        vec!["test1".to_string(), "test2".to_string(),]
+    );
     assert_eq!(new_vhost.tracing, true);
 
     // Delete the vhost
-    ctx
-        .rabbitmq
+    ctx.rabbitmq
         .apis
         .vhosts
         .delete_vhost("test-vhost".to_string())
@@ -76,5 +71,8 @@ async fn can_crud_vhost() {
         .get_vhost("test-vhost".to_string())
         .await;
 
-    assert!(matches!(deleted_vhost, Err(RabbitMqClientError::NotFound(_))));
+    assert!(matches!(
+        deleted_vhost,
+        Err(RabbitMqClientError::NotFound(_))
+    ));
 }
