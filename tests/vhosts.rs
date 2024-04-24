@@ -53,7 +53,7 @@ async fn can_crud_vhost() {
         new_vhost.tags,
         vec!["test1".to_string(), "test2".to_string(),]
     );
-    assert_eq!(new_vhost.tracing, true);
+    assert!(new_vhost.tracing);
 
     // Delete the vhost
     ctx.rabbitmq

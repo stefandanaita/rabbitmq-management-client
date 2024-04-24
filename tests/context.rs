@@ -4,6 +4,7 @@ use rabbitmq_management_client::{RabbitMqClient, RabbitMqClientBuilder};
 const RABBITMQ_API_URL: &str = "http://localhost:15672";
 const RABBITMQ_USERNAME: &str = "guest";
 const RABBITMQ_PASSWORD: &str = "guest";
+
 pub struct TestContext {
     pub rabbitmq: RabbitMqClient,
 }

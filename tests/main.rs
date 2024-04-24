@@ -1,7 +1,7 @@
 use crate::context::TestContext;
 use rabbitmq_management_client::api::overview::RabbitMqClusterName;
 
-mod context;
+pub mod context;
 mod vhosts;
 
 #[tokio::test]
