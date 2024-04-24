@@ -7,7 +7,7 @@ async fn can_get_cluster_overview() {
 
     let overview = ctx.rabbitmq.apis.overview.get_overview().await.unwrap();
 
-    assert_eq!(overview.cluster_name, "rabbit@rabbitmq-management-client");
+    assert_eq!(overview.cluster_name, "rabbit@rabbitmq");
 }
 
 #[tokio::test]
@@ -22,14 +22,14 @@ async fn can_set_cluster_name() {
         .get_cluster_name()
         .await
         .expect("failed to get the cluster name");
-    assert_eq!(&original_name.name, "rabbit@rabbitmq-management-client");
+    assert_eq!(&original_name.name, "rabbit@rabbitmq");
 
     // Change the cluster name
     ctx.rabbitmq
         .apis
         .overview
         .set_cluster_name(RabbitMqClusterName {
-            name: "test@rabbitmq-management-client".to_string(),
+            name: "test@rabbitmq".to_string(),
         })
         .await
         .expect("failed to set the cluster name");
@@ -42,7 +42,7 @@ async fn can_set_cluster_name() {
         .get_cluster_name()
         .await
         .expect("failed to get the cluster name after change");
-    assert_eq!(new_name.name, "test@rabbitmq-management-client");
+    assert_eq!(new_name.name, "test@rabbitmq");
 
     // Reset the name
     ctx.rabbitmq
@@ -58,7 +58,7 @@ async fn can_set_cluster_name() {
         .get_cluster_name()
         .await
         .expect("failed to get the cluster name after reset");
-    assert_eq!(reset_name.name, "rabbit@rabbitmq-management-client");
+    assert_eq!(reset_name.name, "rabbit@rabbitmq");
 }
 
 #[tokio::test]
@@ -76,6 +76,6 @@ async fn can_list_nodes() {
     assert_eq!(nodes.len(), 1);
     assert_eq!(
         nodes.first().unwrap().name,
-        "rabbit@rabbitmq-management-client"
+        "rabbit@rabbitmq"
     );
 }
