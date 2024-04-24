@@ -76,3 +76,22 @@ async fn can_crud_vhost() {
         Err(RabbitMqClientError::NotFound(_))
     ));
 }
+
+#[tokio::test]
+async fn cannot_create_if_vhosts_exists() {
+    let ctx = TestContext::new();
+
+    let result = ctx
+        .rabbitmq
+        .apis
+        .vhosts
+        .create_vhost(RabbitMqVhostRequest {
+            name: "/".to_string(),
+            description: None,
+            tags: vec![],
+            tracing: false,
+        })
+        .await;
+
+    assert!(matches!(result, Err(RabbitMqClientError::AlreadyExists(_))));
+}
