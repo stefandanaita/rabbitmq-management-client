@@ -12,5 +12,5 @@ async fn can_list_exchanges() {
         .await
         .expect("failed to list exchanges");
 
-    assert!(exchanges.len() > 0);
+    assert!(!exchanges.is_empty());
 }
