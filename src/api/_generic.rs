@@ -16,16 +16,22 @@ where
         };
     }
 
+    let text = response
+        .text()
+        .await
+        .map_err(RabbitMqClientError::ParsingError)?;
+
     if status.eq(&StatusCode::UNAUTHORIZED) {
         return Err(RabbitMqClientError::Unauthorized);
     }
 
+    if status.eq(&StatusCode::NOT_FOUND) {
+        return Err(RabbitMqClientError::NotFound(text));
+    }
+
     Err(RabbitMqClientError::ApiError(RabbitMqApiError {
         code: status,
-        text: response
-            .text()
-            .await
-            .map_err(RabbitMqClientError::ParsingError)?,
+        text,
     }))
 }
 

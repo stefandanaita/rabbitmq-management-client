@@ -68,7 +68,7 @@ impl VhostApi {
         let response = self
             .client
             .request(
-                reqwest::Method::DELETE,
+                reqwest::Method::PUT,
                 format!("{}/api/vhosts/{}", self.api_url, request.name),
             )
             .json(&RequestBody {
