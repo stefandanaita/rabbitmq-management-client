@@ -10,47 +10,46 @@ where
     let status = response.status();
 
     if status.is_success() {
-        return match response.json::<T>().await {
+        match response.json::<T>().await {
             Ok(response) => Ok(response),
             Err(e) => Err(RabbitMqClientError::ParsingError(e)),
-        };
+        }
+    } else {
+        let text = response
+            .text()
+            .await
+            .map_err(RabbitMqClientError::ParsingError)?;
+
+        Err(map_error(status, text))
     }
-
-    let text = response
-        .text()
-        .await
-        .map_err(RabbitMqClientError::ParsingError)?;
-
-    if status.eq(&StatusCode::UNAUTHORIZED) {
-        return Err(RabbitMqClientError::Unauthorized);
-    }
-
-    if status.eq(&StatusCode::NOT_FOUND) {
-        return Err(RabbitMqClientError::NotFound(text));
-    }
-
-    Err(RabbitMqClientError::ApiError(RabbitMqApiError {
-        code: status,
-        text,
-    }))
 }
 
 pub async fn handle_empty_response(response: Response) -> Result<(), RabbitMqClientError> {
     let status = response.status();
 
     if status.is_success() {
-        return Ok(());
-    }
-
-    if status.eq(&StatusCode::UNAUTHORIZED) {
-        return Err(RabbitMqClientError::Unauthorized);
-    }
-
-    Err(RabbitMqClientError::ApiError(RabbitMqApiError {
-        code: status,
-        text: response
+        Ok(())
+    } else {
+        let text = response
             .text()
             .await
-            .map_err(RabbitMqClientError::ParsingError)?,
-    }))
+            .map_err(RabbitMqClientError::ParsingError)?;
+
+        Err(map_error(status, text))
+    }
+}
+
+fn map_error(status: StatusCode, text: String) -> RabbitMqClientError {
+    if status.eq(&StatusCode::UNAUTHORIZED) {
+        return RabbitMqClientError::Unauthorized;
+    }
+
+    if status.eq(&StatusCode::NOT_FOUND) {
+        return RabbitMqClientError::NotFound(text);
+    }
+
+    RabbitMqClientError::ApiError(RabbitMqApiError {
+        code: status,
+        text,
+    })
 }

@@ -1,5 +1,8 @@
+use rabbitmq_management_client::api::vhost::{RabbitMqVhost, RabbitMqVhostRequest};
 use rabbitmq_management_client::config::RabbitMqConfiguration;
+use rabbitmq_management_client::errors::RabbitMqClientError;
 use rabbitmq_management_client::{RabbitMqClient, RabbitMqClientBuilder};
+use uuid::Uuid;
 
 const RABBITMQ_API_URL: &str = "http://localhost:15672";
 const RABBITMQ_USERNAME: &str = "guest";
@@ -20,6 +23,27 @@ impl TestContext {
         let rmq = RabbitMqClientBuilder::new(test_config()).build().unwrap();
 
         Self { rabbitmq: rmq }
+    }
+
+    pub async fn create_random_vhost(&self) -> Result<RabbitMqVhost, RabbitMqClientError> {
+        let id = Uuid::new_v4().to_string();
+
+        self.rabbitmq
+            .apis
+            .vhosts
+            .create_vhost(RabbitMqVhostRequest {
+                name: id.clone(),
+                description: Some(format!("{} testing vhost", id.clone())),
+                tags: vec![],
+                tracing: false,
+            })
+            .await?;
+
+        self.rabbitmq.apis.vhosts.get_vhost(id).await
+    }
+
+    pub async fn delete_vhost(&self, name: String) -> Result<(), RabbitMqClientError> {
+        self.rabbitmq.apis.vhosts.delete_vhost(name).await
     }
 }
 

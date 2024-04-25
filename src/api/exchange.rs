@@ -192,9 +192,9 @@ pub struct RabbitMqExchangeMessageStats {
 pub struct RabbitMqExchangeRequest {
     #[serde(rename = "type")]
     pub kind: String,
-    pub auto_delete: Option<bool>,
-    pub durable: Option<bool>,
-    pub internal: Option<bool>,
+    pub auto_delete: bool,
+    pub durable: bool,
+    pub internal: bool,
 }
 
 #[derive(Debug, Serialize)]
