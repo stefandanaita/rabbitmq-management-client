@@ -6,6 +6,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.0.1-alpha.3](https://github.com/stefandanaita/rabbitmq-management-client/compare/v0.0.1-alpha.2...v0.0.1-alpha.3) - 2024-04-25
+
+### Other
+- Transparent logo
+- First readme
+
 ## [0.0.1-alpha.2](https://github.com/stefandanaita/rabbitmq-management-client/compare/v0.0.1-alpha.1...v0.0.1-alpha.2) - 2024-04-24
 
 ### Other
