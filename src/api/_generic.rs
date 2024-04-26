@@ -48,8 +48,5 @@ fn map_error(status: StatusCode, text: String) -> RabbitMqClientError {
         return RabbitMqClientError::NotFound(text);
     }
 
-    RabbitMqClientError::ApiError(RabbitMqApiError {
-        code: status,
-        text,
-    })
+    RabbitMqClientError::ApiError(RabbitMqApiError { code: status, text })
 }
