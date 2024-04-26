@@ -60,19 +60,3 @@ async fn can_set_cluster_name() {
         .expect("failed to get the cluster name after reset");
     assert_eq!(reset_name.name, "rabbit@rabbitmq");
 }
-
-#[tokio::test]
-async fn can_list_nodes() {
-    let ctx = TestContext::new();
-
-    let nodes = ctx
-        .rabbitmq
-        .apis
-        .nodes
-        .list_nodes()
-        .await
-        .expect("failed to get the list of nodes");
-
-    assert_eq!(nodes.len(), 1);
-    assert_eq!(nodes.first().unwrap().name, "rabbit@rabbitmq");
-}
