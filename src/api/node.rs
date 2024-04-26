@@ -51,7 +51,9 @@ impl NodeApi {
             .send()
             .await?;
 
-        handle_response(response).await
+        let wrapper: RabbitMqNodeMemoryWrapper = handle_response(response).await?;
+
+        Ok(wrapper.memory)
     }
 }
 
@@ -98,6 +100,11 @@ pub struct RabbitMqNodeApplication {
     pub name: String,
     pub description: String,
     pub version: String,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct RabbitMqNodeMemoryWrapper {
+    memory: RabbitMqNodeMemory,
 }
 
 #[derive(Debug, Deserialize)]
