@@ -6,6 +6,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.0.1-alpha.4](https://github.com/stefandanaita/rabbitmq-management-client/compare/v0.0.1-alpha.3...v0.0.1-alpha.4) - 2024-04-26
+
+### Other
+- [OSS-6] Test /api/nodes/* endpoints ([#10](https://github.com/stefandanaita/rabbitmq-management-client/pull/10))
+- Enable dependabot ([#8](https://github.com/stefandanaita/rabbitmq-management-client/pull/8))
+
 ## [0.0.1-alpha.3](https://github.com/stefandanaita/rabbitmq-management-client/compare/v0.0.1-alpha.2...v0.0.1-alpha.3) - 2024-04-26
 
 ### Other
