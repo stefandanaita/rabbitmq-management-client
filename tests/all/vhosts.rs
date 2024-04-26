@@ -95,3 +95,17 @@ async fn cannot_create_if_vhosts_exists() {
 
     assert!(matches!(result, Err(RabbitMqClientError::AlreadyExists(_))));
 }
+
+#[tokio::test]
+async fn returns_not_found() {
+    let ctx = TestContext::new();
+
+    let result = ctx
+        .rabbitmq
+        .apis
+        .vhosts
+        .delete_vhost("doesnotexist".to_string())
+        .await;
+
+    assert!(matches!(result, Err(RabbitMqClientError::NotFound(_))));
+}
