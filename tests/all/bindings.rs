@@ -247,7 +247,7 @@ async fn can_get_and_delete_binding() {
             "test-exchange1".to_string(),
             "test-exchange2".to_string(),
             RabbitMqBindingDestinationType::Exchange,
-            binding_id.clone().split("/").last().unwrap().to_string(),
+            binding_id.clone().split('/').last().unwrap().to_string(),
         )
         .await
         .expect("failed to get the binding");
@@ -263,7 +263,7 @@ async fn can_get_and_delete_binding() {
             "test-exchange1".to_string(),
             "test-exchange2".to_string(),
             RabbitMqBindingDestinationType::Exchange,
-            binding_id.split("/").last().unwrap().to_string(),
+            binding_id.split('/').last().unwrap().to_string(),
         )
         .await
         .expect("failed to delete binding");
