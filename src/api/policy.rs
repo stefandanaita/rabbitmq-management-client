@@ -115,8 +115,10 @@ pub struct RabbitMqPolicy {
 pub struct RabbitMqPolicyRequest {
     pub pattern: String,
     pub definition: HashMap<String, RabbitMqPolicyDefinitionValue>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub priority: Option<i64>,
     #[serde(rename = "apply-to")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub apply_to: Option<String>,
 }
 
