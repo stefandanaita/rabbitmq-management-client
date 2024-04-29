@@ -35,7 +35,7 @@ impl BindingApi {
         handle_response(response).await
     }
 
-    pub async fn list_exchange_bindings(
+    pub async fn filter_bindings(
         &self,
         vhost: String,
         source: String,
@@ -54,6 +54,34 @@ impl BindingApi {
                 format!(
                     "{}/api/bindings/{}/e/{}/{}/{}",
                     self.api_url, vhost, source, destination_type, destination
+                ),
+            )
+            .send()
+            .await?;
+
+        handle_response(response).await
+    }
+
+    pub async fn get_binding(
+        &self,
+        vhost: String,
+        source: String,
+        destination: String,
+        destination_type: RabbitMqBindingDestinationType,
+        properties_key: String,
+    ) -> Result<RabbitMqBinding, RabbitMqClientError> {
+        let destination_type = match destination_type {
+            RabbitMqBindingDestinationType::Exchange => "e",
+            RabbitMqBindingDestinationType::Queue => "q",
+        };
+
+        let response = self
+            .client
+            .request(
+                reqwest::Method::GET,
+                format!(
+                    "{}/api/bindings/{}/e/{}/{}/{}/{}",
+                    self.api_url, vhost, source, destination_type, destination, properties_key
                 ),
             )
             .send()
@@ -108,6 +136,34 @@ impl BindingApi {
                 "Binding Location header not present".to_string(),
             ))
         }
+    }
+
+    pub async fn delete_binding(
+        &self,
+        vhost: String,
+        source: String,
+        destination: String,
+        destination_type: RabbitMqBindingDestinationType,
+        properties_key: String,
+    ) -> Result<(), RabbitMqClientError> {
+        let destination_type = match destination_type {
+            RabbitMqBindingDestinationType::Exchange => "e",
+            RabbitMqBindingDestinationType::Queue => "q",
+        };
+
+        let response = self
+            .client
+            .request(
+                reqwest::Method::DELETE,
+                format!(
+                    "{}/api/bindings/{}/e/{}/{}/{}/{}",
+                    self.api_url, vhost, source, destination_type, destination, properties_key
+                ),
+            )
+            .send()
+            .await?;
+
+        handle_empty_response(response).await
     }
 }
 
