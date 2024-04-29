@@ -18,6 +18,8 @@ pub enum RabbitMqClientError {
     Request(#[source] reqwest::Error),
     #[error("RabbitMq API error: {0:?}")]
     ApiError(RabbitMqApiError),
+    #[error("Unexpected API response: {0}")]
+    UnexpectedResponse(String),
 }
 
 impl From<reqwest_middleware::Error> for RabbitMqClientError {

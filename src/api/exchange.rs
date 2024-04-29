@@ -60,7 +60,7 @@ impl ExchangeApi {
         request: RabbitMqExchangeRequest,
     ) -> Result<(), RabbitMqClientError> {
         let exchanges = self.list_exchanges(Some(vhost.clone())).await?;
-        if let Some(existing) = exchanges.iter().find(|v| v.name == exchange) {
+        if let Some(existing) = exchanges.iter().find(|e| e.name == exchange) {
             return Err(RabbitMqClientError::AlreadyExists(format!(
                 "{} exchange",
                 existing.name

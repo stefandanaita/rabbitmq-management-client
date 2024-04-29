@@ -67,6 +67,42 @@ impl QueueApi {
         handle_response(response).await
     }
 
+    pub async fn create_queue(
+        &self,
+        vhost: String,
+        queue: String,
+        request: RabbitMqQueueRequest,
+    ) -> Result<(), RabbitMqClientError> {
+        let queues = self.list_queues(Some(vhost.clone())).await?;
+        if let Some(existing) = queues.iter().find(|q| q.name == queue) {
+            return Err(RabbitMqClientError::AlreadyExists(format!(
+                "{} queue",
+                existing.name
+            )));
+        }
+
+        self.update_queue(vhost, queue, request).await
+    }
+
+    pub async fn update_queue(
+        &self,
+        vhost: String,
+        queue: String,
+        request: RabbitMqQueueRequest,
+    ) -> Result<(), RabbitMqClientError> {
+        let response = self
+            .client
+            .request(
+                reqwest::Method::PUT,
+                format!("{}/api/queues/{}/{}", self.api_url, vhost, queue),
+            )
+            .json(&request)
+            .send()
+            .await?;
+
+        handle_empty_response(response).await
+    }
+
     pub async fn delete_queue(
         &self,
         vhost: String,
@@ -183,6 +219,16 @@ pub struct RabbitMqQueueGarbageCollection {
     pub min_bin_vheap_size: i64,
     pub min_heap_size: i64,
     pub minor_gcs: i64,
+}
+
+#[derive(Debug, Serialize)]
+pub struct RabbitMqQueueRequest {
+    pub auto_delete: bool,
+    pub durable: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub arguments: Option<HashMap<String, String>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub node: Option<String>,
 }
 
 #[derive(Debug, Serialize)]
