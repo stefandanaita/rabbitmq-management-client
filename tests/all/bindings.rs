@@ -133,7 +133,7 @@ async fn can_filter_bindings() {
         .await
         .expect("failed to create exchange");
 
-    // Bind the exchanges together
+    // Bind the exchange and the queue
     let binding_id = ctx
         .rabbitmq
         .apis
