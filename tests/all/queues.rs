@@ -244,8 +244,7 @@ async fn can_get_queue_bindings() {
 
     assert!(bindings
         .iter()
-        .find(|b| b.source == "test-exchange" && b.routing_key == "test-queue-routing")
-        .is_some());
+        .any(|b| b.source == "test-exchange" && b.routing_key == "test-queue-routing"));
 
     ctx.delete_vhost(vhost.name)
         .await
