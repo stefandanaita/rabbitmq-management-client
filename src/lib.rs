@@ -58,14 +58,17 @@ impl RabbitMqClientBuilder {
     }
 
     pub fn build(self) -> Result<RabbitMqClient, RabbitMqClientError> {
-        let client: ClientWithMiddleware = self.preset_client.unwrap_or_else(|| {
-            ClientBuilder::new(reqwest::Client::new())
-                .with(AuthenticationMiddleware {
-                    username: self.config.rabbitmq_username,
-                    password: self.config.rabbitmq_password,
-                })
-                .build()
-        });
+        let client_builder = match self.preset_client {
+            None => ClientBuilder::new(reqwest::Client::new()),
+            Some(c) => ClientBuilder::from_client(c),
+        };
+
+        let client = client_builder
+            .with(AuthenticationMiddleware {
+                username: self.config.rabbitmq_username,
+                password: self.config.rabbitmq_password,
+            })
+            .build();
 
         Ok(RabbitMqClient {
             apis: build_apis(self.config.rabbitmq_api_url.clone(), client.clone()),
