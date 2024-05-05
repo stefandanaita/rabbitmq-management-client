@@ -1,6 +1,7 @@
-pub mod basic;
+mod basic;
 mod bindings;
-pub mod context;
+mod context;
 mod exchanges;
 mod nodes;
-pub mod vhosts;
+mod queues;
+mod vhosts;

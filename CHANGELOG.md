@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.0.1-alpha.6](https://github.com/stefandanaita/rabbitmq-management-client/compare/v0.0.1-alpha.5...v0.0.1-alpha.6) - 2024-04-30
+
+### Other
+- [OSS-26] Queues testing ([#14](https://github.com/stefandanaita/rabbitmq-management-client/pull/14))
+
 ## [0.0.1-alpha.5](https://github.com/stefandanaita/rabbitmq-management-client/compare/v0.0.1-alpha.4...v0.0.1-alpha.5) - 2024-04-29
 
 ### Other
