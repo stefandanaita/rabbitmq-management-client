@@ -6,6 +6,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.0.1-alpha.7](https://github.com/stefandanaita/rabbitmq-management-client/compare/v0.0.1-alpha.6...v0.0.1-alpha.7) - 2024-05-06
+
+### Other
+- [OSS-103] Use the new reqwest_middleware::ClientBuilder method ([#17](https://github.com/stefandanaita/rabbitmq-management-client/pull/17))
+- Merge branch 'main' of github.com:stefandanaita/rabbitmq-management-client
+- Use temporary reqwest-middleware branch until PR gets merged
+
 ## [0.0.1-alpha.6](https://github.com/stefandanaita/rabbitmq-management-client/compare/v0.0.1-alpha.5...v0.0.1-alpha.6) - 2024-04-30
 
 ### Other
