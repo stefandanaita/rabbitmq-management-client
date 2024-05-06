@@ -1,3 +1,4 @@
+use reqwest_middleware::ClientBuilder;
 use crate::context::TestContext;
 use rabbitmq_management_client::api::overview::RabbitMqClusterName;
 
@@ -59,4 +60,21 @@ async fn can_set_cluster_name() {
         .await
         .expect("failed to get the cluster name after reset");
     assert_eq!(reset_name.name, "rabbit@rabbitmq");
+}
+
+#[tokio::test]
+async fn uses_preset_client() {
+    let client = ClientBuilder::new(reqwest::Client::new())
+        .build();
+
+    let ctx = TestContext::new_with_preset_client(client);
+
+    let cluster_name= ctx
+        .rabbitmq
+        .apis
+        .overview
+        .get_cluster_name()
+        .await
+        .expect("failed to get the cluster name");
+    assert_eq!(&cluster_name.name, "rabbit@rabbitmq");
 }

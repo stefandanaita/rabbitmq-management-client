@@ -1,3 +1,4 @@
+use reqwest_middleware::ClientWithMiddleware;
 use rabbitmq_management_client::api::vhost::{RabbitMqVhost, RabbitMqVhostRequest};
 use rabbitmq_management_client::config::RabbitMqConfiguration;
 use rabbitmq_management_client::errors::RabbitMqClientError;
@@ -21,6 +22,15 @@ impl Default for TestContext {
 impl TestContext {
     pub fn new() -> Self {
         let rmq = RabbitMqClientBuilder::new(test_config()).build().unwrap();
+
+        Self { rabbitmq: rmq }
+    }
+
+    pub fn new_with_preset_client(client: ClientWithMiddleware) -> Self {
+        let rmq = RabbitMqClientBuilder::new(test_config())
+            .preset_client(client)
+            .build()
+            .unwrap();
 
         Self { rabbitmq: rmq }
     }
