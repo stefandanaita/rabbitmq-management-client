@@ -1,8 +1,8 @@
-use reqwest_middleware::ClientWithMiddleware;
 use rabbitmq_management_client::api::vhost::{RabbitMqVhost, RabbitMqVhostRequest};
 use rabbitmq_management_client::config::RabbitMqConfiguration;
 use rabbitmq_management_client::errors::RabbitMqClientError;
 use rabbitmq_management_client::{RabbitMqClient, RabbitMqClientBuilder};
+use reqwest_middleware::ClientWithMiddleware;
 use uuid::Uuid;
 
 const RABBITMQ_API_URL: &str = "http://localhost:15672";

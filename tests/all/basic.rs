@@ -1,6 +1,6 @@
-use reqwest_middleware::ClientBuilder;
 use crate::context::TestContext;
 use rabbitmq_management_client::api::overview::RabbitMqClusterName;
+use reqwest_middleware::ClientBuilder;
 
 #[tokio::test]
 async fn can_get_cluster_overview() {
@@ -64,12 +64,11 @@ async fn can_set_cluster_name() {
 
 #[tokio::test]
 async fn uses_preset_client() {
-    let client = ClientBuilder::new(reqwest::Client::new())
-        .build();
+    let client = ClientBuilder::new(reqwest::Client::new()).build();
 
     let ctx = TestContext::new_with_preset_client(client);
 
-    let cluster_name= ctx
+    let cluster_name = ctx
         .rabbitmq
         .apis
         .overview
