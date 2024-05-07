@@ -155,6 +155,9 @@ pub struct RabbitMqVhost {
     pub name: String,
     pub tags: Vec<String>,
     pub tracing: bool,
+    pub messages: Option<i64>,
+    pub messages_ready: Option<i64>,
+    pub messages_unacknowledged: Option<i64>,
 }
 
 #[derive(Debug, Deserialize)]
