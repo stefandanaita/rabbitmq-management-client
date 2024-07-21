@@ -1,22 +1,43 @@
 use crate::api::_generic::{handle_empty_response, handle_response};
 use crate::api::permission::{RabbitMqPermission, RabbitMqTopicPermission};
 use crate::errors::RabbitMqClientError;
-use reqwest_middleware::ClientWithMiddleware;
+use crate::RabbitMqClient;
+use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
-#[derive(Debug, Clone)]
-pub struct VhostApi {
-    api_url: String,
-    client: ClientWithMiddleware,
+#[async_trait]
+pub trait VhostApi {
+    async fn list_vhosts(&self) -> Result<Vec<RabbitMqVhost>, RabbitMqClientError>;
+
+    async fn get_vhost(&self, vhost: String) -> Result<RabbitMqVhost, RabbitMqClientError>;
+
+    async fn create_vhost(&self, request: RabbitMqVhostRequest) -> Result<(), RabbitMqClientError>;
+
+    async fn update_vhost(&self, request: RabbitMqVhostRequest) -> Result<(), RabbitMqClientError>;
+
+    async fn delete_vhost(&self, vhost: String) -> Result<(), RabbitMqClientError>;
+
+    async fn start_vhost_on_node(
+        &self,
+        vhost: String,
+        node: String,
+    ) -> Result<(), RabbitMqClientError>;
+
+    async fn list_vhost_permissions(
+        &self,
+        vhost: String,
+    ) -> Result<Vec<RabbitMqPermission>, RabbitMqClientError>;
+
+    async fn list_vhost_topic_permissions(
+        &self,
+        vhost: String,
+    ) -> Result<Vec<RabbitMqTopicPermission>, RabbitMqClientError>;
 }
 
-impl VhostApi {
-    pub fn new(api_url: String, client: ClientWithMiddleware) -> Self {
-        Self { api_url, client }
-    }
-
-    pub async fn list_vhosts(&self) -> Result<Vec<RabbitMqVhost>, RabbitMqClientError> {
+#[async_trait]
+impl VhostApi for RabbitMqClient {
+    async fn list_vhosts(&self) -> Result<Vec<RabbitMqVhost>, RabbitMqClientError> {
         let response = self
             .client
             .request(reqwest::Method::GET, format!("{}/api/vhosts", self.api_url))
@@ -26,7 +47,7 @@ impl VhostApi {
         handle_response(response).await
     }
 
-    pub async fn get_vhost(&self, vhost: String) -> Result<RabbitMqVhost, RabbitMqClientError> {
+    async fn get_vhost(&self, vhost: String) -> Result<RabbitMqVhost, RabbitMqClientError> {
         let response = self
             .client
             .request(
@@ -39,10 +60,7 @@ impl VhostApi {
         handle_response(response).await
     }
 
-    pub async fn create_vhost(
-        &self,
-        request: RabbitMqVhostRequest,
-    ) -> Result<(), RabbitMqClientError> {
+    async fn create_vhost(&self, request: RabbitMqVhostRequest) -> Result<(), RabbitMqClientError> {
         let vhosts = self.list_vhosts().await?;
         if let Some(existing) = vhosts.iter().find(|v| v.name == request.name.clone()) {
             return Err(RabbitMqClientError::AlreadyExists(format!(
@@ -54,10 +72,7 @@ impl VhostApi {
         self.update_vhost(request).await
     }
 
-    pub async fn update_vhost(
-        &self,
-        request: RabbitMqVhostRequest,
-    ) -> Result<(), RabbitMqClientError> {
+    async fn update_vhost(&self, request: RabbitMqVhostRequest) -> Result<(), RabbitMqClientError> {
         #[derive(Debug, Serialize)]
         struct RequestBody {
             #[serde(skip_serializing_if = "Option::is_none")]
@@ -83,7 +98,7 @@ impl VhostApi {
         handle_empty_response(response).await
     }
 
-    pub async fn delete_vhost(&self, vhost: String) -> Result<(), RabbitMqClientError> {
+    async fn delete_vhost(&self, vhost: String) -> Result<(), RabbitMqClientError> {
         let response = self
             .client
             .request(
@@ -96,7 +111,7 @@ impl VhostApi {
         handle_empty_response(response).await
     }
 
-    pub async fn start_vhost_on_node(
+    async fn start_vhost_on_node(
         &self,
         vhost: String,
         node: String,
@@ -113,7 +128,7 @@ impl VhostApi {
         handle_empty_response(response).await
     }
 
-    pub async fn list_vhost_permissions(
+    async fn list_vhost_permissions(
         &self,
         vhost: String,
     ) -> Result<Vec<RabbitMqPermission>, RabbitMqClientError> {
@@ -129,7 +144,7 @@ impl VhostApi {
         handle_response(response).await
     }
 
-    pub async fn list_vhost_topic_permissions(
+    async fn list_vhost_topic_permissions(
         &self,
         vhost: String,
     ) -> Result<Vec<RabbitMqTopicPermission>, RabbitMqClientError> {

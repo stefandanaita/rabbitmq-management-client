@@ -1,9 +1,9 @@
 use crate::context::TestContext;
 use rabbitmq_management_client::api::binding::{
-    RabbitMqBindingDestinationType, RabbitMqBindingRequest,
+    BindingApi, RabbitMqBindingDestinationType, RabbitMqBindingRequest,
 };
-use rabbitmq_management_client::api::exchange::RabbitMqExchangeRequest;
-use rabbitmq_management_client::api::queue::RabbitMqQueueRequest;
+use rabbitmq_management_client::api::exchange::{ExchangeApi, RabbitMqExchangeRequest};
+use rabbitmq_management_client::api::queue::{QueueApi, RabbitMqQueueRequest};
 use rabbitmq_management_client::errors::RabbitMqClientError;
 use std::collections::HashMap;
 
@@ -19,8 +19,6 @@ async fn can_create_and_list_bindings() {
 
     // Create an exchange
     ctx.rabbitmq
-        .apis
-        .exchanges
         .create_exchange(
             vhost.name.clone(),
             "test-exchange1".to_string(),
@@ -36,8 +34,6 @@ async fn can_create_and_list_bindings() {
 
     // Create another exchange
     ctx.rabbitmq
-        .apis
-        .exchanges
         .create_exchange(
             vhost.name.clone(),
             "test-exchange2".to_string(),
@@ -54,8 +50,6 @@ async fn can_create_and_list_bindings() {
     // Bind the exchanges together
     let binding_id = ctx
         .rabbitmq
-        .apis
-        .bindings
         .create_binding(
             vhost.name.clone(),
             "test-exchange1".to_string(),
@@ -72,8 +66,6 @@ async fn can_create_and_list_bindings() {
     // List bindings
     let bindings = ctx
         .rabbitmq
-        .apis
-        .bindings
         .list_bindings(Some(vhost.name.clone()))
         .await
         .expect("failed to list bindings");
@@ -101,8 +93,6 @@ async fn can_filter_bindings() {
 
     // Create an exchange
     ctx.rabbitmq
-        .apis
-        .exchanges
         .create_exchange(
             vhost.name.clone(),
             "test-exchange".to_string(),
@@ -118,8 +108,6 @@ async fn can_filter_bindings() {
 
     // Create a queue
     ctx.rabbitmq
-        .apis
-        .queues
         .create_queue(
             vhost.name.clone(),
             "test-queue".to_string(),
@@ -136,8 +124,6 @@ async fn can_filter_bindings() {
     // Bind the exchange and the queue
     let binding_id = ctx
         .rabbitmq
-        .apis
-        .bindings
         .create_binding(
             vhost.name.clone(),
             "test-exchange".to_string(),
@@ -154,8 +140,6 @@ async fn can_filter_bindings() {
     // List bindings
     let bindings = ctx
         .rabbitmq
-        .apis
-        .bindings
         .filter_bindings(
             vhost.name.clone(),
             "test-exchange".to_string(),
@@ -188,8 +172,6 @@ async fn can_get_and_delete_binding() {
 
     // Create an exchange
     ctx.rabbitmq
-        .apis
-        .exchanges
         .create_exchange(
             vhost.name.clone(),
             "test-exchange1".to_string(),
@@ -205,8 +187,6 @@ async fn can_get_and_delete_binding() {
 
     // Create another exchange
     ctx.rabbitmq
-        .apis
-        .exchanges
         .create_exchange(
             vhost.name.clone(),
             "test-exchange2".to_string(),
@@ -223,8 +203,6 @@ async fn can_get_and_delete_binding() {
     // Bind the exchanges together
     let binding_id = ctx
         .rabbitmq
-        .apis
-        .bindings
         .create_binding(
             vhost.name.clone(),
             "test-exchange1".to_string(),
@@ -240,8 +218,6 @@ async fn can_get_and_delete_binding() {
 
     let binding = ctx
         .rabbitmq
-        .apis
-        .bindings
         .get_binding(
             vhost.name.clone(),
             "test-exchange1".to_string(),
@@ -256,8 +232,6 @@ async fn can_get_and_delete_binding() {
 
     // Delete the binding
     ctx.rabbitmq
-        .apis
-        .bindings
         .delete_binding(
             vhost.name.clone(),
             "test-exchange1".to_string(),
@@ -285,8 +259,6 @@ async fn errors_not_found() {
 
     let result = ctx
         .rabbitmq
-        .apis
-        .bindings
         .get_binding(
             vhost.name.clone(),
             "test-exchange1".to_string(),
@@ -315,8 +287,6 @@ async fn cannot_create_binding_if_source_exchange_not_found() {
 
     // Create an exchange
     ctx.rabbitmq
-        .apis
-        .exchanges
         .create_exchange(
             vhost.name.clone(),
             "test-exchange".to_string(),
@@ -333,8 +303,6 @@ async fn cannot_create_binding_if_source_exchange_not_found() {
     // Bind the exchanges together
     let result = ctx
         .rabbitmq
-        .apis
-        .bindings
         .create_binding(
             vhost.name.clone(),
             "does_not_exist".to_string(),
@@ -366,8 +334,6 @@ async fn cannot_create_binding_if_destination_exchange_not_found() {
 
     // Create an exchange
     ctx.rabbitmq
-        .apis
-        .exchanges
         .create_exchange(
             vhost.name.clone(),
             "test-exchange".to_string(),
@@ -383,8 +349,6 @@ async fn cannot_create_binding_if_destination_exchange_not_found() {
 
     let result = ctx
         .rabbitmq
-        .apis
-        .bindings
         .create_binding(
             vhost.name.clone(),
             "test-exchange".to_string(),
@@ -416,8 +380,6 @@ async fn cannot_create_binding_if_destination_queue_not_found() {
 
     // Create an exchange
     ctx.rabbitmq
-        .apis
-        .exchanges
         .create_exchange(
             vhost.name.clone(),
             "test-exchange".to_string(),
@@ -433,8 +395,6 @@ async fn cannot_create_binding_if_destination_queue_not_found() {
 
     let result = ctx
         .rabbitmq
-        .apis
-        .bindings
         .create_binding(
             vhost.name.clone(),
             "test-exchange".to_string(),
@@ -466,8 +426,6 @@ async fn cannot_delete_binding_not_found() {
 
     // Create an exchange
     ctx.rabbitmq
-        .apis
-        .exchanges
         .create_exchange(
             vhost.name.clone(),
             "test-exchange1".to_string(),
@@ -483,8 +441,6 @@ async fn cannot_delete_binding_not_found() {
 
     // Create another exchange
     ctx.rabbitmq
-        .apis
-        .exchanges
         .create_exchange(
             vhost.name.clone(),
             "test-exchange2".to_string(),
@@ -500,8 +456,6 @@ async fn cannot_delete_binding_not_found() {
 
     let result = ctx
         .rabbitmq
-        .apis
-        .bindings
         .delete_binding(
             vhost.name.clone(),
             "test-exchange1".to_string(),

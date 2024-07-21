@@ -1,5 +1,5 @@
 use crate::context::TestContext;
-use rabbitmq_management_client::api::exchange::RabbitMqExchangeRequest;
+use rabbitmq_management_client::api::exchange::{ExchangeApi, RabbitMqExchangeRequest};
 use rabbitmq_management_client::errors::RabbitMqClientError;
 
 #[tokio::test]
@@ -8,8 +8,6 @@ async fn can_list_exchanges() {
 
     let exchanges = ctx
         .rabbitmq
-        .apis
-        .exchanges
         .list_exchanges(None)
         .await
         .expect("failed to list exchanges");
@@ -28,8 +26,6 @@ async fn can_crud_exchange() {
 
     // Create the exchange
     ctx.rabbitmq
-        .apis
-        .exchanges
         .create_exchange(
             vhost.name.clone(),
             "test-exchange".to_string(),
@@ -46,8 +42,6 @@ async fn can_crud_exchange() {
     // Get the exchange
     let exchange = ctx
         .rabbitmq
-        .apis
-        .exchanges
         .get_exchange(vhost.name.clone(), "test-exchange".to_string())
         .await
         .expect("failed to get the exchange back");
@@ -59,8 +53,6 @@ async fn can_crud_exchange() {
 
     // Delete the exchange
     ctx.rabbitmq
-        .apis
-        .exchanges
         .delete_exchange(vhost.name.clone(), "test-exchange".to_string())
         .await
         .expect("failed to delete the exchange");
@@ -81,8 +73,6 @@ async fn cannot_create_if_exchange_exists() {
 
     // Create the exchange
     ctx.rabbitmq
-        .apis
-        .exchanges
         .create_exchange(
             vhost.name.clone(),
             "test-exchange".to_string(),
@@ -99,8 +89,6 @@ async fn cannot_create_if_exchange_exists() {
     // Recreate the exchange
     let result = ctx
         .rabbitmq
-        .apis
-        .exchanges
         .create_exchange(
             vhost.name.clone(),
             "test-exchange".to_string(),
@@ -130,8 +118,6 @@ async fn returns_not_found() {
 
     let result = ctx
         .rabbitmq
-        .apis
-        .exchanges
         .delete_exchange(vhost.name.clone(), "doesnotexist".to_string())
         .await;
 

@@ -1,21 +1,39 @@
 use crate::api::_generic::{handle_empty_response, handle_response};
 use crate::api::permission::{RabbitMqPermission, RabbitMqTopicPermission};
 use crate::errors::RabbitMqClientError;
-use reqwest_middleware::ClientWithMiddleware;
+use crate::RabbitMqClient;
+use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Clone)]
-pub struct UserApi {
-    api_url: String,
-    client: ClientWithMiddleware,
+#[async_trait]
+pub trait UserApi {
+    async fn who_am_i(&self) -> Result<RabbitMqWhoAmI, RabbitMqClientError>;
+
+    async fn list_users(&self) -> Result<Vec<RabbitMqUser>, RabbitMqClientError>;
+
+    async fn list_users_without_permissions(
+        &self,
+    ) -> Result<Vec<RabbitMqUser>, RabbitMqClientError>;
+
+    async fn bulk_delete_users(
+        &self,
+        users: RabbitMqUsersBulkDeleteRequest,
+    ) -> Result<(), RabbitMqClientError>;
+
+    async fn list_user_permissions(
+        &self,
+        user: String,
+    ) -> Result<Vec<RabbitMqPermission>, RabbitMqClientError>;
+
+    async fn list_user_topic_permissions(
+        &self,
+        user: String,
+    ) -> Result<Vec<RabbitMqTopicPermission>, RabbitMqClientError>;
 }
 
-impl UserApi {
-    pub fn new(api_url: String, client: ClientWithMiddleware) -> Self {
-        Self { api_url, client }
-    }
-
-    pub async fn who_am_i(&self) -> Result<RabbitMqWhoAmI, RabbitMqClientError> {
+#[async_trait]
+impl UserApi for RabbitMqClient {
+    async fn who_am_i(&self) -> Result<RabbitMqWhoAmI, RabbitMqClientError> {
         let response = self
             .client
             .request(reqwest::Method::GET, format!("{}/api/whoami", self.api_url))
@@ -25,7 +43,7 @@ impl UserApi {
         handle_response(response).await
     }
 
-    pub async fn list_users(&self) -> Result<Vec<RabbitMqUser>, RabbitMqClientError> {
+    async fn list_users(&self) -> Result<Vec<RabbitMqUser>, RabbitMqClientError> {
         let response = self
             .client
             .request(reqwest::Method::GET, format!("{}/api/users", self.api_url))
@@ -35,7 +53,7 @@ impl UserApi {
         handle_response(response).await
     }
 
-    pub async fn list_users_without_permissions(
+    async fn list_users_without_permissions(
         &self,
     ) -> Result<Vec<RabbitMqUser>, RabbitMqClientError> {
         let response = self
@@ -50,7 +68,7 @@ impl UserApi {
         handle_response(response).await
     }
 
-    pub async fn bulk_delete_users(
+    async fn bulk_delete_users(
         &self,
         users: RabbitMqUsersBulkDeleteRequest,
     ) -> Result<(), RabbitMqClientError> {
@@ -67,7 +85,7 @@ impl UserApi {
         handle_empty_response(response).await
     }
 
-    pub async fn list_user_permissions(
+    async fn list_user_permissions(
         &self,
         user: String,
     ) -> Result<Vec<RabbitMqPermission>, RabbitMqClientError> {
@@ -83,7 +101,7 @@ impl UserApi {
         handle_response(response).await
     }
 
-    pub async fn list_user_topic_permissions(
+    async fn list_user_topic_permissions(
         &self,
         user: String,
     ) -> Result<Vec<RabbitMqTopicPermission>, RabbitMqClientError> {

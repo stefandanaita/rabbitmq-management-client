@@ -1,5 +1,5 @@
 use crate::context::TestContext;
-use rabbitmq_management_client::api::vhost::RabbitMqVhostRequest;
+use rabbitmq_management_client::api::vhost::{RabbitMqVhostRequest, VhostApi};
 use rabbitmq_management_client::errors::RabbitMqClientError;
 
 #[tokio::test]
@@ -8,8 +8,6 @@ async fn can_list_vhosts() {
 
     let vhosts = ctx
         .rabbitmq
-        .apis
-        .vhosts
         .list_vhosts()
         .await
         .expect("failed to list vhosts");
@@ -27,8 +25,6 @@ async fn can_crud_vhost() {
 
     // Create the vhost
     ctx.rabbitmq
-        .apis
-        .vhosts
         .create_vhost(RabbitMqVhostRequest {
             name: "test-vhost".to_string(),
             description: Some("testing vhost".to_string()),
@@ -41,8 +37,6 @@ async fn can_crud_vhost() {
     // Get the newly created vhost
     let new_vhost = ctx
         .rabbitmq
-        .apis
-        .vhosts
         .get_vhost("test-vhost".to_string())
         .await
         .expect("failed to get the newly created vhost");
@@ -57,19 +51,12 @@ async fn can_crud_vhost() {
 
     // Delete the vhost
     ctx.rabbitmq
-        .apis
-        .vhosts
         .delete_vhost("test-vhost".to_string())
         .await
         .expect("failed to delete the newly created vhost");
 
     // Should fail to get the vhost again
-    let deleted_vhost = ctx
-        .rabbitmq
-        .apis
-        .vhosts
-        .get_vhost("test-vhost".to_string())
-        .await;
+    let deleted_vhost = ctx.rabbitmq.get_vhost("test-vhost".to_string()).await;
 
     assert!(matches!(
         deleted_vhost,
@@ -83,8 +70,6 @@ async fn cannot_create_if_vhosts_exists() {
 
     let result = ctx
         .rabbitmq
-        .apis
-        .vhosts
         .create_vhost(RabbitMqVhostRequest {
             name: "/".to_string(),
             description: None,
@@ -100,12 +85,7 @@ async fn cannot_create_if_vhosts_exists() {
 async fn returns_not_found() {
     let ctx = TestContext::new();
 
-    let result = ctx
-        .rabbitmq
-        .apis
-        .vhosts
-        .delete_vhost("doesnotexist".to_string())
-        .await;
+    let result = ctx.rabbitmq.delete_vhost("doesnotexist".to_string()).await;
 
     assert!(matches!(result, Err(RabbitMqClientError::NotFound(_))));
 }

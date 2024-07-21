@@ -1,22 +1,59 @@
 use crate::api::_generic::{handle_empty_response, handle_response};
 use crate::api::binding::RabbitMqBinding;
 use crate::errors::RabbitMqClientError;
-use reqwest_middleware::ClientWithMiddleware;
+use crate::RabbitMqClient;
+use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
-#[derive(Debug, Clone)]
-pub struct QueueApi {
-    api_url: String,
-    client: ClientWithMiddleware,
+#[async_trait]
+pub trait QueueApi {
+    async fn list_queues(
+        &self,
+        vhost: Option<String>,
+    ) -> Result<Vec<RabbitMqQueue>, RabbitMqClientError>;
+
+    async fn get_queue(
+        &self,
+        vhost: String,
+        name: String,
+    ) -> Result<RabbitMqQueue, RabbitMqClientError>;
+
+    async fn get_queue_bindings(
+        &self,
+        vhost: String,
+        name: String,
+    ) -> Result<Vec<RabbitMqBinding>, RabbitMqClientError>;
+
+    async fn create_queue(
+        &self,
+        vhost: String,
+        queue: String,
+        request: RabbitMqQueueRequest,
+    ) -> Result<(), RabbitMqClientError>;
+
+    async fn update_queue(
+        &self,
+        vhost: String,
+        queue: String,
+        request: RabbitMqQueueRequest,
+    ) -> Result<(), RabbitMqClientError>;
+
+    async fn delete_queue(&self, vhost: String, name: String) -> Result<(), RabbitMqClientError>;
+
+    async fn purge_queue(&self, vhost: String, name: String) -> Result<(), RabbitMqClientError>;
+
+    async fn set_queue_actions(
+        &self,
+        vhost: String,
+        queue: String,
+        action: RabbitMqQueueAction,
+    ) -> Result<(), RabbitMqClientError>;
 }
 
-impl QueueApi {
-    pub fn new(api_url: String, client: ClientWithMiddleware) -> Self {
-        Self { api_url, client }
-    }
-
-    pub async fn list_queues(
+#[async_trait]
+impl QueueApi for RabbitMqClient {
+    async fn list_queues(
         &self,
         vhost: Option<String>,
     ) -> Result<Vec<RabbitMqQueue>, RabbitMqClientError> {
@@ -32,7 +69,7 @@ impl QueueApi {
         handle_response(response).await
     }
 
-    pub async fn get_queue(
+    async fn get_queue(
         &self,
         vhost: String,
         name: String,
@@ -49,7 +86,7 @@ impl QueueApi {
         handle_response(response).await
     }
 
-    pub async fn get_queue_bindings(
+    async fn get_queue_bindings(
         &self,
         vhost: String,
         name: String,
@@ -66,7 +103,7 @@ impl QueueApi {
         handle_response(response).await
     }
 
-    pub async fn create_queue(
+    async fn create_queue(
         &self,
         vhost: String,
         queue: String,
@@ -84,7 +121,7 @@ impl QueueApi {
         }
     }
 
-    pub async fn update_queue(
+    async fn update_queue(
         &self,
         vhost: String,
         queue: String,
@@ -103,11 +140,7 @@ impl QueueApi {
         handle_empty_response(response).await
     }
 
-    pub async fn delete_queue(
-        &self,
-        vhost: String,
-        name: String,
-    ) -> Result<(), RabbitMqClientError> {
+    async fn delete_queue(&self, vhost: String, name: String) -> Result<(), RabbitMqClientError> {
         let response = self
             .client
             .request(
@@ -120,11 +153,7 @@ impl QueueApi {
         handle_empty_response(response).await
     }
 
-    pub async fn purge_queue(
-        &self,
-        vhost: String,
-        name: String,
-    ) -> Result<(), RabbitMqClientError> {
+    async fn purge_queue(&self, vhost: String, name: String) -> Result<(), RabbitMqClientError> {
         let response = self
             .client
             .request(
@@ -137,7 +166,7 @@ impl QueueApi {
         handle_empty_response(response).await
     }
 
-    pub async fn set_queue_actions(
+    async fn set_queue_actions(
         &self,
         vhost: String,
         queue: String,

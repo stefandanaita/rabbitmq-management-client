@@ -1,9 +1,9 @@
 use crate::context::TestContext;
 use rabbitmq_management_client::api::binding::{
-    RabbitMqBindingDestinationType, RabbitMqBindingRequest,
+    BindingApi, RabbitMqBindingDestinationType, RabbitMqBindingRequest,
 };
-use rabbitmq_management_client::api::exchange::RabbitMqExchangeRequest;
-use rabbitmq_management_client::api::queue::{RabbitMqQueueAction, RabbitMqQueueRequest};
+use rabbitmq_management_client::api::exchange::{ExchangeApi, RabbitMqExchangeRequest};
+use rabbitmq_management_client::api::queue::{QueueApi, RabbitMqQueueAction, RabbitMqQueueRequest};
 use rabbitmq_management_client::errors::RabbitMqClientError;
 use std::collections::HashMap;
 
@@ -18,8 +18,6 @@ async fn can_list_queues() {
 
     // Create a couple of queues
     ctx.rabbitmq
-        .apis
-        .queues
         .create_queue(
             vhost.name.clone(),
             "test-queue1".to_string(),
@@ -34,8 +32,6 @@ async fn can_list_queues() {
         .expect("failed to create queue1");
 
     ctx.rabbitmq
-        .apis
-        .queues
         .create_queue(
             vhost.name.clone(),
             "test-queue2".to_string(),
@@ -51,8 +47,6 @@ async fn can_list_queues() {
 
     let queues = ctx
         .rabbitmq
-        .apis
-        .queues
         .list_queues(Some(vhost.name.clone()))
         .await
         .expect("failed to list queues");
@@ -75,8 +69,6 @@ async fn can_crud_queue() {
 
     // Create a couple of queues
     ctx.rabbitmq
-        .apis
-        .queues
         .create_queue(
             vhost.name.clone(),
             "test-queue".to_string(),
@@ -93,8 +85,6 @@ async fn can_crud_queue() {
     // Get the queue
     let queue = ctx
         .rabbitmq
-        .apis
-        .queues
         .get_queue(vhost.name.clone(), "test-queue".to_string())
         .await
         .expect("failed to get the queue");
@@ -103,8 +93,6 @@ async fn can_crud_queue() {
 
     // Delete the queue
     ctx.rabbitmq
-        .apis
-        .queues
         .delete_queue(vhost.name.clone(), "test-queue".to_string())
         .await
         .expect("failed to delete queue");
@@ -112,8 +100,6 @@ async fn can_crud_queue() {
     // Getting the queue should error
     let result = ctx
         .rabbitmq
-        .apis
-        .queues
         .get_queue(vhost.name.clone(), "test-queue".to_string())
         .await;
 
@@ -135,8 +121,6 @@ async fn cannot_create_queue_that_already_exists() {
 
     // Create a couple of queues
     ctx.rabbitmq
-        .apis
-        .queues
         .create_queue(
             vhost.name.clone(),
             "test-queue".to_string(),
@@ -152,8 +136,6 @@ async fn cannot_create_queue_that_already_exists() {
 
     let result = ctx
         .rabbitmq
-        .apis
-        .queues
         .create_queue(
             vhost.name.clone(),
             "test-queue".to_string(),
@@ -184,8 +166,6 @@ async fn can_get_queue_bindings() {
 
     // Create the exchange
     ctx.rabbitmq
-        .apis
-        .exchanges
         .create_exchange(
             vhost.name.clone(),
             "test-exchange".to_string(),
@@ -201,8 +181,6 @@ async fn can_get_queue_bindings() {
 
     // Create the queue
     ctx.rabbitmq
-        .apis
-        .queues
         .create_queue(
             vhost.name.clone(),
             "test-queue".to_string(),
@@ -218,8 +196,6 @@ async fn can_get_queue_bindings() {
 
     // Bind the exchange and the queue
     ctx.rabbitmq
-        .apis
-        .bindings
         .create_binding(
             vhost.name.clone(),
             "test-exchange".to_string(),
@@ -236,8 +212,6 @@ async fn can_get_queue_bindings() {
     // Get queue bindings
     let bindings = ctx
         .rabbitmq
-        .apis
-        .queues
         .get_queue_bindings(vhost.name.clone(), "test-queue".to_string())
         .await
         .expect("failed to get queue bindings");
@@ -262,8 +236,6 @@ async fn can_set_queue_action() {
 
     // Create the queue
     ctx.rabbitmq
-        .apis
-        .queues
         .create_queue(
             vhost.name.clone(),
             "test-queue".to_string(),
@@ -279,8 +251,6 @@ async fn can_set_queue_action() {
 
     // Set the sync action
     ctx.rabbitmq
-        .apis
-        .queues
         .set_queue_actions(
             vhost.name.clone(),
             "test-queue".to_string(),
@@ -291,8 +261,6 @@ async fn can_set_queue_action() {
 
     // Set the cancel_sync action
     ctx.rabbitmq
-        .apis
-        .queues
         .set_queue_actions(
             vhost.name.clone(),
             "test-queue".to_string(),

@@ -1,21 +1,25 @@
 use crate::api::_generic::handle_response;
 use crate::api::overview::{RabbitMqContext, RabbitMqExchangeType};
 use crate::errors::RabbitMqClientError;
-use reqwest_middleware::ClientWithMiddleware;
+use crate::RabbitMqClient;
+use async_trait::async_trait;
 use serde::Deserialize;
 
-#[derive(Debug, Clone)]
-pub struct NodeApi {
-    api_url: String,
-    client: ClientWithMiddleware,
+#[async_trait]
+pub trait NodeApi {
+    async fn list_nodes(&self) -> Result<Vec<RabbitMqNode>, RabbitMqClientError>;
+
+    async fn get_node(&self, node: String) -> Result<RabbitMqNode, RabbitMqClientError>;
+
+    async fn get_node_memory(
+        &self,
+        node: String,
+    ) -> Result<RabbitMqNodeMemory, RabbitMqClientError>;
 }
 
-impl NodeApi {
-    pub fn new(api_url: String, client: ClientWithMiddleware) -> Self {
-        Self { api_url, client }
-    }
-
-    pub async fn list_nodes(&self) -> Result<Vec<RabbitMqNode>, RabbitMqClientError> {
+#[async_trait]
+impl NodeApi for RabbitMqClient {
+    async fn list_nodes(&self) -> Result<Vec<RabbitMqNode>, RabbitMqClientError> {
         let response = self
             .client
             .request(reqwest::Method::GET, format!("{}/api/nodes", self.api_url))
@@ -25,7 +29,7 @@ impl NodeApi {
         handle_response(response).await
     }
 
-    pub async fn get_node(&self, node: String) -> Result<RabbitMqNode, RabbitMqClientError> {
+    async fn get_node(&self, node: String) -> Result<RabbitMqNode, RabbitMqClientError> {
         let response = self
             .client
             .request(
@@ -38,7 +42,7 @@ impl NodeApi {
         handle_response(response).await
     }
 
-    pub async fn get_node_memory(
+    async fn get_node_memory(
         &self,
         node: String,
     ) -> Result<RabbitMqNodeMemory, RabbitMqClientError> {

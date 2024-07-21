@@ -1,21 +1,56 @@
 use crate::api::_generic::{handle_empty_response, handle_response};
 use crate::errors::RabbitMqClientError;
-use reqwest_middleware::ClientWithMiddleware;
+use crate::RabbitMqClient;
+use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
-#[derive(Debug, Clone)]
-pub struct BindingApi {
-    api_url: String,
-    client: ClientWithMiddleware,
+#[async_trait]
+pub trait BindingApi {
+    async fn list_bindings(
+        &self,
+        vhost: Option<String>,
+    ) -> Result<Vec<RabbitMqBinding>, RabbitMqClientError>;
+
+    async fn filter_bindings(
+        &self,
+        vhost: String,
+        source: String,
+        destination: String,
+        destination_type: RabbitMqBindingDestinationType,
+    ) -> Result<Vec<RabbitMqBinding>, RabbitMqClientError>;
+
+    async fn get_binding(
+        &self,
+        vhost: String,
+        source: String,
+        destination: String,
+        destination_type: RabbitMqBindingDestinationType,
+        properties_key: String,
+    ) -> Result<RabbitMqBinding, RabbitMqClientError>;
+
+    async fn create_binding(
+        &self,
+        vhost: String,
+        source: String,
+        destination: String,
+        destination_type: RabbitMqBindingDestinationType,
+        request: RabbitMqBindingRequest,
+    ) -> Result<String, RabbitMqClientError>;
+
+    async fn delete_binding(
+        &self,
+        vhost: String,
+        source: String,
+        destination: String,
+        destination_type: RabbitMqBindingDestinationType,
+        properties_key: String,
+    ) -> Result<(), RabbitMqClientError>;
 }
 
-impl BindingApi {
-    pub fn new(api_url: String, client: ClientWithMiddleware) -> Self {
-        Self { api_url, client }
-    }
-
-    pub async fn list_bindings(
+#[async_trait]
+impl BindingApi for RabbitMqClient {
+    async fn list_bindings(
         &self,
         vhost: Option<String>,
     ) -> Result<Vec<RabbitMqBinding>, RabbitMqClientError> {
@@ -35,7 +70,7 @@ impl BindingApi {
         handle_response(response).await
     }
 
-    pub async fn filter_bindings(
+    async fn filter_bindings(
         &self,
         vhost: String,
         source: String,
@@ -62,7 +97,7 @@ impl BindingApi {
         handle_response(response).await
     }
 
-    pub async fn get_binding(
+    async fn get_binding(
         &self,
         vhost: String,
         source: String,
@@ -90,7 +125,7 @@ impl BindingApi {
         handle_response(response).await
     }
 
-    pub async fn create_binding(
+    async fn create_binding(
         &self,
         vhost: String,
         source: String,
@@ -138,7 +173,7 @@ impl BindingApi {
         }
     }
 
-    pub async fn delete_binding(
+    async fn delete_binding(
         &self,
         vhost: String,
         source: String,
