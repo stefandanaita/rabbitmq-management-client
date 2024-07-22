@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.0.1-alpha.10](https://github.com/stefandanaita/rabbitmq-management-client/compare/v0.0.1-alpha.9...v0.0.1-alpha.10) - 2024-07-22
+
+### Other
+- [OSS-112] Switch the client to using traits ([#24](https://github.com/stefandanaita/rabbitmq-management-client/pull/24))
+
 ## [0.0.1-alpha.9](https://github.com/stefandanaita/rabbitmq-management-client/compare/v0.0.1-alpha.8...v0.0.1-alpha.9) - 2024-06-07
 
 ### Other
