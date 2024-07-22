@@ -1,20 +1,24 @@
 use crate::api::_generic::{handle_empty_response, handle_response};
 use crate::errors::RabbitMqClientError;
-use reqwest_middleware::ClientWithMiddleware;
+use crate::RabbitMqClient;
+use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Clone)]
-pub struct OverviewApi {
-    api_url: String,
-    client: ClientWithMiddleware,
+#[async_trait]
+pub trait OverviewApi {
+    async fn get_overview(&self) -> Result<RabbitMqOverview, RabbitMqClientError>;
+
+    async fn get_cluster_name(&self) -> Result<RabbitMqClusterName, RabbitMqClientError>;
+
+    async fn set_cluster_name(
+        &self,
+        request: RabbitMqClusterName,
+    ) -> Result<(), RabbitMqClientError>;
 }
 
-impl OverviewApi {
-    pub fn new(api_url: String, client: ClientWithMiddleware) -> Self {
-        Self { api_url, client }
-    }
-
-    pub async fn get_overview(&self) -> Result<RabbitMqOverview, RabbitMqClientError> {
+#[async_trait]
+impl OverviewApi for RabbitMqClient {
+    async fn get_overview(&self) -> Result<RabbitMqOverview, RabbitMqClientError> {
         let response = self
             .client
             .request(
@@ -27,7 +31,7 @@ impl OverviewApi {
         handle_response(response).await
     }
 
-    pub async fn get_cluster_name(&self) -> Result<RabbitMqClusterName, RabbitMqClientError> {
+    async fn get_cluster_name(&self) -> Result<RabbitMqClusterName, RabbitMqClientError> {
         let response = self
             .client
             .request(
@@ -40,7 +44,7 @@ impl OverviewApi {
         handle_response(response).await
     }
 
-    pub async fn set_cluster_name(
+    async fn set_cluster_name(
         &self,
         request: RabbitMqClusterName,
     ) -> Result<(), RabbitMqClientError> {

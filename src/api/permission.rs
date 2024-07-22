@@ -1,20 +1,45 @@
 use crate::api::_generic::{handle_empty_response, handle_response};
 use crate::errors::RabbitMqClientError;
-use reqwest_middleware::ClientWithMiddleware;
+use crate::RabbitMqClient;
+use async_trait::async_trait;
 use serde::Deserialize;
 
-#[derive(Debug, Clone)]
-pub struct PermissionApi {
-    api_url: String,
-    client: ClientWithMiddleware,
+#[async_trait]
+pub trait PermissionApi {
+    async fn list_permissions(&self) -> Result<Vec<RabbitMqPermission>, RabbitMqClientError>;
+
+    async fn get_permission(
+        &self,
+        vhost: String,
+        user: String,
+    ) -> Result<RabbitMqPermission, RabbitMqClientError>;
+
+    async fn delete_permission(
+        &self,
+        vhost: String,
+        user: String,
+    ) -> Result<(), RabbitMqClientError>;
+
+    async fn list_topic_permissions(
+        &self,
+    ) -> Result<Vec<RabbitMqTopicPermission>, RabbitMqClientError>;
+
+    async fn get_topic_permission(
+        &self,
+        vhost: String,
+        user: String,
+    ) -> Result<RabbitMqTopicPermission, RabbitMqClientError>;
+
+    async fn delete_topic_permission(
+        &self,
+        vhost: String,
+        user: String,
+    ) -> Result<(), RabbitMqClientError>;
 }
 
-impl PermissionApi {
-    pub fn new(api_url: String, client: ClientWithMiddleware) -> Self {
-        Self { api_url, client }
-    }
-
-    pub async fn list_permissions(&self) -> Result<Vec<RabbitMqPermission>, RabbitMqClientError> {
+#[async_trait]
+impl PermissionApi for RabbitMqClient {
+    async fn list_permissions(&self) -> Result<Vec<RabbitMqPermission>, RabbitMqClientError> {
         let response = self
             .client
             .request(
@@ -27,7 +52,7 @@ impl PermissionApi {
         handle_response(response).await
     }
 
-    pub async fn get_permission(
+    async fn get_permission(
         &self,
         vhost: String,
         user: String,
@@ -44,7 +69,7 @@ impl PermissionApi {
         handle_response(response).await
     }
 
-    pub async fn delete_permission(
+    async fn delete_permission(
         &self,
         vhost: String,
         user: String,
@@ -61,7 +86,7 @@ impl PermissionApi {
         handle_empty_response(response).await
     }
 
-    pub async fn list_topic_permissions(
+    async fn list_topic_permissions(
         &self,
     ) -> Result<Vec<RabbitMqTopicPermission>, RabbitMqClientError> {
         let response = self
@@ -76,7 +101,7 @@ impl PermissionApi {
         handle_response(response).await
     }
 
-    pub async fn get_topic_permission(
+    async fn get_topic_permission(
         &self,
         vhost: String,
         user: String,
@@ -93,7 +118,7 @@ impl PermissionApi {
         handle_response(response).await
     }
 
-    pub async fn delete_topic_permission(
+    async fn delete_topic_permission(
         &self,
         vhost: String,
         user: String,

@@ -1,4 +1,5 @@
 use crate::context::TestContext;
+use rabbitmq_management_client::api::node::NodeApi;
 
 #[tokio::test]
 async fn can_list_nodes() {
@@ -6,8 +7,6 @@ async fn can_list_nodes() {
 
     let nodes = ctx
         .rabbitmq
-        .apis
-        .nodes
         .list_nodes()
         .await
         .expect("failed to get the list of nodes");
@@ -22,8 +21,6 @@ async fn can_get_node() {
 
     let node = ctx
         .rabbitmq
-        .apis
-        .nodes
         .get_node("rabbit@rabbitmq".to_string())
         .await
         .expect("failed to get the list of nodes");
@@ -38,8 +35,6 @@ async fn can_get_node_memory() {
 
     let memory = ctx
         .rabbitmq
-        .apis
-        .nodes
         .get_node_memory("rabbit@rabbitmq".to_string())
         .await
         .expect("failed to get the list of nodes");

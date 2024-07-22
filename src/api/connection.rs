@@ -1,20 +1,20 @@
 use crate::api::_generic::handle_response;
 use crate::errors::RabbitMqClientError;
-use reqwest_middleware::ClientWithMiddleware;
+use crate::RabbitMqClient;
+use async_trait::async_trait;
 use serde::Deserialize;
 
-#[derive(Debug, Clone)]
-pub struct ConnectionApi {
-    api_url: String,
-    client: ClientWithMiddleware,
+#[async_trait]
+pub trait ConnectionApi {
+    async fn list_connections(
+        &self,
+        vhost: Option<String>,
+    ) -> Result<Vec<RabbitMqConnection>, RabbitMqClientError>;
 }
 
-impl ConnectionApi {
-    pub fn new(api_url: String, client: ClientWithMiddleware) -> Self {
-        Self { api_url, client }
-    }
-
-    pub async fn list_connections(
+#[async_trait]
+impl ConnectionApi for RabbitMqClient {
+    async fn list_connections(
         &self,
         vhost: Option<String>,
     ) -> Result<Vec<RabbitMqConnection>, RabbitMqClientError> {

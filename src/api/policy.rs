@@ -1,21 +1,44 @@
 use crate::api::_generic::{handle_empty_response, handle_response};
 use crate::errors::RabbitMqClientError;
-use reqwest_middleware::ClientWithMiddleware;
+use crate::RabbitMqClient;
+use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
-#[derive(Debug, Clone)]
-pub struct PolicyApi {
-    api_url: String,
-    client: ClientWithMiddleware,
+#[async_trait]
+pub trait PolicyApi {
+    async fn list_policies(
+        &self,
+        vhost: Option<String>,
+    ) -> Result<Vec<RabbitMqPolicy>, RabbitMqClientError>;
+
+    async fn get_policy(
+        &self,
+        vhost: String,
+        policy: String,
+    ) -> Result<RabbitMqPolicy, RabbitMqClientError>;
+
+    async fn create_policy(
+        &self,
+        vhost: String,
+        policy: String,
+        request: RabbitMqPolicyRequest,
+    ) -> Result<(), RabbitMqClientError>;
+
+    async fn update_policy(
+        &self,
+        vhost: String,
+        policy: String,
+        request: RabbitMqPolicyRequest,
+    ) -> Result<(), RabbitMqClientError>;
+
+    async fn delete_policy(&self, vhost: String, policy: String)
+        -> Result<(), RabbitMqClientError>;
 }
 
-impl PolicyApi {
-    pub fn new(api_url: String, client: ClientWithMiddleware) -> Self {
-        Self { api_url, client }
-    }
-
-    pub async fn list_policies(
+#[async_trait]
+impl PolicyApi for RabbitMqClient {
+    async fn list_policies(
         &self,
         vhost: Option<String>,
     ) -> Result<Vec<RabbitMqPolicy>, RabbitMqClientError> {
@@ -35,7 +58,7 @@ impl PolicyApi {
         handle_response(response).await
     }
 
-    pub async fn get_policy(
+    async fn get_policy(
         &self,
         vhost: String,
         policy: String,
@@ -52,7 +75,7 @@ impl PolicyApi {
         handle_response(response).await
     }
 
-    pub async fn create_policy(
+    async fn create_policy(
         &self,
         vhost: String,
         policy: String,
@@ -69,7 +92,7 @@ impl PolicyApi {
         self.update_policy(vhost, policy, request).await
     }
 
-    pub async fn update_policy(
+    async fn update_policy(
         &self,
         vhost: String,
         policy: String,
@@ -88,7 +111,7 @@ impl PolicyApi {
         handle_empty_response(response).await
     }
 
-    pub async fn delete_policy(
+    async fn delete_policy(
         &self,
         vhost: String,
         policy: String,

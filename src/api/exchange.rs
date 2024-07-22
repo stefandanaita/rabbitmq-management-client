@@ -1,22 +1,67 @@
 use crate::api::_generic::{handle_empty_response, handle_response};
 use crate::api::binding::RabbitMqBinding;
 use crate::errors::RabbitMqClientError;
-use reqwest_middleware::ClientWithMiddleware;
+use crate::RabbitMqClient;
+use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
-#[derive(Debug, Clone)]
-pub struct ExchangeApi {
-    api_url: String,
-    client: ClientWithMiddleware,
+#[async_trait]
+pub trait ExchangeApi {
+    async fn list_exchanges(
+        &self,
+        vhost: Option<String>,
+    ) -> Result<Vec<RabbitMqExchange>, RabbitMqClientError>;
+
+    async fn get_exchange(
+        &self,
+        vhost: String,
+        exchange: String,
+    ) -> Result<RabbitMqExchange, RabbitMqClientError>;
+
+    async fn create_exchange(
+        &self,
+        vhost: String,
+        exchange: String,
+        request: RabbitMqExchangeRequest,
+    ) -> Result<(), RabbitMqClientError>;
+
+    async fn update_exchange(
+        &self,
+        vhost: String,
+        exchange: String,
+        request: RabbitMqExchangeRequest,
+    ) -> Result<(), RabbitMqClientError>;
+
+    async fn delete_exchange(
+        &self,
+        vhost: String,
+        exchange: String,
+    ) -> Result<(), RabbitMqClientError>;
+
+    async fn publish_message(
+        &self,
+        vhost: String,
+        exchange: String,
+        request: RabbitMqExchangeMessagePublishRequest,
+    ) -> Result<RabbitMqExchangeMessagePublishResponse, RabbitMqClientError>;
+
+    async fn list_source_bindings(
+        &self,
+        vhost: String,
+        exchange: String,
+    ) -> Result<Vec<RabbitMqBinding>, RabbitMqClientError>;
+
+    async fn list_destination_bindings(
+        &self,
+        vhost: String,
+        exchange: String,
+    ) -> Result<Vec<RabbitMqBinding>, RabbitMqClientError>;
 }
 
-impl ExchangeApi {
-    pub fn new(api_url: String, client: ClientWithMiddleware) -> Self {
-        Self { api_url, client }
-    }
-
-    pub async fn list_exchanges(
+#[async_trait]
+impl ExchangeApi for RabbitMqClient {
+    async fn list_exchanges(
         &self,
         vhost: Option<String>,
     ) -> Result<Vec<RabbitMqExchange>, RabbitMqClientError> {
@@ -36,7 +81,7 @@ impl ExchangeApi {
         handle_response(response).await
     }
 
-    pub async fn get_exchange(
+    async fn get_exchange(
         &self,
         vhost: String,
         exchange: String,
@@ -53,7 +98,7 @@ impl ExchangeApi {
         handle_response(response).await
     }
 
-    pub async fn create_exchange(
+    async fn create_exchange(
         &self,
         vhost: String,
         exchange: String,
@@ -70,7 +115,7 @@ impl ExchangeApi {
         self.update_exchange(vhost, exchange, request).await
     }
 
-    pub async fn update_exchange(
+    async fn update_exchange(
         &self,
         vhost: String,
         exchange: String,
@@ -89,7 +134,7 @@ impl ExchangeApi {
         handle_empty_response(response).await
     }
 
-    pub async fn delete_exchange(
+    async fn delete_exchange(
         &self,
         vhost: String,
         exchange: String,
@@ -106,7 +151,7 @@ impl ExchangeApi {
         handle_empty_response(response).await
     }
 
-    pub async fn publish_message(
+    async fn publish_message(
         &self,
         vhost: String,
         exchange: String,
@@ -128,7 +173,7 @@ impl ExchangeApi {
         handle_response(response).await
     }
 
-    pub async fn list_source_bindings(
+    async fn list_source_bindings(
         &self,
         vhost: String,
         exchange: String,
@@ -148,7 +193,7 @@ impl ExchangeApi {
         handle_response(response).await
     }
 
-    pub async fn list_destination_bindings(
+    async fn list_destination_bindings(
         &self,
         vhost: String,
         exchange: String,

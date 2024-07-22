@@ -1,4 +1,4 @@
-use rabbitmq_management_client::api::vhost::{RabbitMqVhost, RabbitMqVhostRequest};
+use rabbitmq_management_client::api::vhost::{RabbitMqVhost, RabbitMqVhostRequest, VhostApi};
 use rabbitmq_management_client::config::RabbitMqConfiguration;
 use rabbitmq_management_client::errors::RabbitMqClientError;
 use rabbitmq_management_client::{RabbitMqClient, RabbitMqClientBuilder};
@@ -39,8 +39,6 @@ impl TestContext {
         let id = Uuid::new_v4().to_string();
 
         self.rabbitmq
-            .apis
-            .vhosts
             .create_vhost(RabbitMqVhostRequest {
                 name: id.clone(),
                 description: Some(format!("{} testing vhost", id.clone())),
@@ -49,11 +47,11 @@ impl TestContext {
             })
             .await?;
 
-        self.rabbitmq.apis.vhosts.get_vhost(id).await
+        self.rabbitmq.get_vhost(id).await
     }
 
     pub async fn delete_vhost(&self, name: String) -> Result<(), RabbitMqClientError> {
-        self.rabbitmq.apis.vhosts.delete_vhost(name).await
+        self.rabbitmq.delete_vhost(name).await
     }
 }
 

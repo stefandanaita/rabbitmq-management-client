@@ -1,12 +1,12 @@
 use crate::context::TestContext;
-use rabbitmq_management_client::api::overview::RabbitMqClusterName;
+use rabbitmq_management_client::api::overview::{OverviewApi, RabbitMqClusterName};
 use reqwest_middleware::ClientBuilder;
 
 #[tokio::test]
 async fn can_get_cluster_overview() {
     let ctx = TestContext::new();
 
-    let overview = ctx.rabbitmq.apis.overview.get_overview().await.unwrap();
+    let overview = ctx.rabbitmq.get_overview().await.unwrap();
 
     assert_eq!(overview.cluster_name, "rabbit@rabbitmq");
 }
@@ -18,8 +18,6 @@ async fn can_set_cluster_name() {
     // Get original name
     let original_name = ctx
         .rabbitmq
-        .apis
-        .overview
         .get_cluster_name()
         .await
         .expect("failed to get the cluster name");
@@ -27,8 +25,6 @@ async fn can_set_cluster_name() {
 
     // Change the cluster name
     ctx.rabbitmq
-        .apis
-        .overview
         .set_cluster_name(RabbitMqClusterName {
             name: "test@rabbitmq".to_string(),
         })
@@ -38,8 +34,6 @@ async fn can_set_cluster_name() {
     // Get the new name
     let new_name = ctx
         .rabbitmq
-        .apis
-        .overview
         .get_cluster_name()
         .await
         .expect("failed to get the cluster name after change");
@@ -47,15 +41,11 @@ async fn can_set_cluster_name() {
 
     // Reset the name
     ctx.rabbitmq
-        .apis
-        .overview
         .set_cluster_name(original_name)
         .await
         .expect("failed to set the cluster name");
     let reset_name = ctx
         .rabbitmq
-        .apis
-        .overview
         .get_cluster_name()
         .await
         .expect("failed to get the cluster name after reset");
@@ -70,8 +60,6 @@ async fn uses_preset_client() {
 
     let cluster_name = ctx
         .rabbitmq
-        .apis
-        .overview
         .get_cluster_name()
         .await
         .expect("failed to get the cluster name");
