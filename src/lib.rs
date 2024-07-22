@@ -1,6 +1,7 @@
-use crate::config::RabbitMqConfiguration;
-use crate::errors::RabbitMqClientError;
-use crate::middlewares::authentication::AuthenticationMiddleware;
+use crate::{
+    config::RabbitMqConfiguration, errors::RabbitMqClientError,
+    middlewares::authentication::AuthenticationMiddleware,
+};
 use reqwest_middleware::{ClientBuilder, ClientWithMiddleware};
 
 pub mod api;
@@ -38,6 +39,10 @@ impl RabbitMqClientBuilder {
             None => ClientBuilder::new(reqwest::Client::new()),
             Some(c) => ClientBuilder::from_client(c),
         };
+
+        if self.config.rabbitmq_username.is_empty() || self.config.rabbitmq_password.is_empty() {
+            return Err(RabbitMqClientError::MissingCredentials);
+        }
 
         let client = client_builder
             .with(AuthenticationMiddleware {
