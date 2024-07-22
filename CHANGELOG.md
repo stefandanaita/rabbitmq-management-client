@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.0.1-alpha.11](https://github.com/stefandanaita/rabbitmq-management-client/compare/v0.0.1-alpha.10...v0.0.1-alpha.11) - 2024-07-22
+
+### Other
+- Fail to create the client if any of the credentials are missing ([#26](https://github.com/stefandanaita/rabbitmq-management-client/pull/26))
+
 ## [0.0.1-alpha.10](https://github.com/stefandanaita/rabbitmq-management-client/compare/v0.0.1-alpha.9...v0.0.1-alpha.10) - 2024-07-22
 
 ### Other
