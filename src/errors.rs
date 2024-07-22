@@ -4,6 +4,8 @@ use http::StatusCode;
 pub enum RabbitMqClientError {
     #[error("Unauthorized")]
     Unauthorized,
+    #[error("Missing credentials")]
+    MissingCredentials,
     #[error("Resource already exists: {0}")]
     AlreadyExists(String),
     #[error("Resource not found: {0}")]
