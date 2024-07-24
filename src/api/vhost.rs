@@ -170,9 +170,12 @@ pub struct RabbitMqVhost {
     pub name: String,
     pub tags: Vec<String>,
     pub tracing: bool,
-    pub messages: Option<i64>,
-    pub messages_ready: Option<i64>,
-    pub messages_unacknowledged: Option<i64>,
+    #[serde(default)]
+    pub messages: i64,
+    #[serde(default)]
+    pub messages_ready: i64,
+    #[serde(default)]
+    pub messages_unacknowledged: i64,
 }
 
 #[derive(Debug, Deserialize)]
