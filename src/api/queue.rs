@@ -198,6 +198,14 @@ pub struct RabbitMqQueue {
     pub auto_delete: bool,
     pub durable: bool,
     pub exclusive: bool,
+    #[serde(default)]
+    pub messages: i64,
+    #[serde(default)]
+    pub messages_ready: i64,
+    #[serde(default)]
+    pub messages_unacknowledged: i64,
+    pub garbage_collection: Option<RabbitMqQueueGarbageCollection>,
+    pub message_stats: Option<RabbitMqQueueMessageStats>,
 }
 
 #[derive(Debug, Deserialize)]
