@@ -210,14 +210,23 @@ pub struct RabbitMqQueue {
 
 #[derive(Debug, Deserialize)]
 pub struct RabbitMqQueueMessageStats {
+    #[serde(default)]
     pub ack: i64,
+    #[serde(default)]
     pub deliver: i64,
+    #[serde(default)]
     pub deliver_get: i64,
+    #[serde(default)]
     pub deliver_no_ack: i64,
+    #[serde(default)]
     pub get: i64,
+    #[serde(default)]
     pub get_empty: i64,
+    #[serde(default)]
     pub get_no_ack: i64,
+    #[serde(default)]
     pub publish: i64,
+    #[serde(default)]
     pub redeliver: i64,
 }
 
