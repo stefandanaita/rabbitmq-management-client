@@ -5,6 +5,7 @@ use crate::RabbitMqClient;
 use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
+use rust_decimal::Decimal;
 
 #[async_trait]
 pub trait QueueApi {
@@ -198,7 +199,7 @@ impl QueueApi for RabbitMqClient {
 pub struct RabbitMqQueue {
     pub name: String,
     pub node: String,
-    pub arguments: HashMap<String, String>,
+    pub arguments: HashMap<String, RabbitMqArgument>,
     pub state: String,
     #[serde(rename = "type")]
     pub kind: String,
@@ -214,6 +215,13 @@ pub struct RabbitMqQueue {
     pub messages_unacknowledged: i64,
     pub garbage_collection: Option<RabbitMqQueueGarbageCollection>,
     pub message_stats: Option<RabbitMqQueueMessageStats>,
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(untagged)]
+pub enum RabbitMqArgument {
+    String(String),
+    Decimal(Decimal),
 }
 
 #[derive(Debug, Deserialize)]
