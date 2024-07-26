@@ -53,6 +53,7 @@ pub trait QueueApi {
 
 #[async_trait]
 impl QueueApi for RabbitMqClient {
+    #[tracing::instrument(skip(self))]
     async fn list_queues(
         &self,
         vhost: Option<String>,
@@ -69,6 +70,7 @@ impl QueueApi for RabbitMqClient {
         handle_response(response).await
     }
 
+    #[tracing::instrument(skip(self))]
     async fn get_queue(
         &self,
         vhost: String,
@@ -86,6 +88,7 @@ impl QueueApi for RabbitMqClient {
         handle_response(response).await
     }
 
+    #[tracing::instrument(skip(self))]
     async fn get_queue_bindings(
         &self,
         vhost: String,
@@ -103,6 +106,7 @@ impl QueueApi for RabbitMqClient {
         handle_response(response).await
     }
 
+    #[tracing::instrument(skip(self))]
     async fn create_queue(
         &self,
         vhost: String,
@@ -121,6 +125,7 @@ impl QueueApi for RabbitMqClient {
         }
     }
 
+    #[tracing::instrument(skip(self))]
     async fn update_queue(
         &self,
         vhost: String,
@@ -140,6 +145,7 @@ impl QueueApi for RabbitMqClient {
         handle_empty_response(response).await
     }
 
+    #[tracing::instrument(skip(self))]
     async fn delete_queue(&self, vhost: String, name: String) -> Result<(), RabbitMqClientError> {
         let response = self
             .client
@@ -153,6 +159,7 @@ impl QueueApi for RabbitMqClient {
         handle_empty_response(response).await
     }
 
+    #[tracing::instrument(skip(self))]
     async fn purge_queue(&self, vhost: String, name: String) -> Result<(), RabbitMqClientError> {
         let response = self
             .client
@@ -166,6 +173,7 @@ impl QueueApi for RabbitMqClient {
         handle_empty_response(response).await
     }
 
+    #[tracing::instrument(skip(self))]
     async fn set_queue_actions(
         &self,
         vhost: String,
