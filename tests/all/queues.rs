@@ -3,10 +3,13 @@ use rabbitmq_management_client::api::binding::{
     BindingApi, RabbitMqBindingDestinationType, RabbitMqBindingRequest,
 };
 use rabbitmq_management_client::api::exchange::{ExchangeApi, RabbitMqExchangeRequest};
+use rabbitmq_management_client::api::message::{
+    MessageApi, RabbitMqGetMessagesAckMode, RabbitMqGetMessagesEncoding,
+    RabbitMqGetMessagesOptions, RabbitMqMessageEncoding, RabbitMqPublishMessageRequest,
+};
 use rabbitmq_management_client::api::queue::{QueueApi, RabbitMqQueueAction, RabbitMqQueueRequest};
 use rabbitmq_management_client::errors::RabbitMqClientError;
 use std::collections::HashMap;
-use rabbitmq_management_client::api::message::{MessageApi, RabbitMqGetMessagesAckMode, RabbitMqGetMessagesEncoding, RabbitMqGetMessagesOptions, RabbitMqMessageEncoding, RabbitMqPublishMessageRequest};
 
 #[tokio::test]
 async fn can_list_queues() {
@@ -330,7 +333,8 @@ async fn can_purge_queue() {
         .expect("failed to create binding");
 
     // Publish message to exchange
-    let published = ctx.rabbitmq
+    let published = ctx
+        .rabbitmq
         .publish_message(
             vhost.name.clone(),
             "test-exchange".to_string(),
@@ -339,7 +343,7 @@ async fn can_purge_queue() {
                 routing_key: "test-queue-routing".to_string(),
                 payload: "first-message".to_string(),
                 payload_encoding: RabbitMqMessageEncoding::String,
-            }
+            },
         )
         .await
         .expect("failed to publish the message");
@@ -355,7 +359,7 @@ async fn can_purge_queue() {
                 routing_key: "test-queue-routing".to_string(),
                 payload: "second-message".to_string(),
                 payload_encoding: RabbitMqMessageEncoding::String,
-            }
+            },
         )
         .await
         .expect("failed to publish the message");
@@ -363,13 +367,18 @@ async fn can_purge_queue() {
     assert!(published.routed);
 
     // Read the message from the queue
-    let messages = ctx.rabbitmq
-        .get_messages(vhost.name.clone(), "test-queue".to_string(), RabbitMqGetMessagesOptions {
-            count: 5,
-            ack_mode: RabbitMqGetMessagesAckMode::AckRequeueTrue,
-            encoding: RabbitMqGetMessagesEncoding::Auto,
-            truncate: None,
-        })
+    let messages = ctx
+        .rabbitmq
+        .get_messages(
+            vhost.name.clone(),
+            "test-queue".to_string(),
+            RabbitMqGetMessagesOptions {
+                count: 5,
+                ack_mode: RabbitMqGetMessagesAckMode::AckRequeueTrue,
+                encoding: RabbitMqGetMessagesEncoding::Auto,
+                truncate: None,
+            },
+        )
         .await
         .expect("failed to consume the message");
 
@@ -380,13 +389,18 @@ async fn can_purge_queue() {
         .await
         .expect("failed to purge the queue");
 
-    let messages = ctx.rabbitmq
-        .get_messages(vhost.name.clone(), "test-queue".to_string(), RabbitMqGetMessagesOptions {
-            count: 5,
-            ack_mode: RabbitMqGetMessagesAckMode::AckRequeueTrue,
-            encoding: RabbitMqGetMessagesEncoding::Auto,
-            truncate: None,
-        })
+    let messages = ctx
+        .rabbitmq
+        .get_messages(
+            vhost.name.clone(),
+            "test-queue".to_string(),
+            RabbitMqGetMessagesOptions {
+                count: 5,
+                ack_mode: RabbitMqGetMessagesAckMode::AckRequeueTrue,
+                encoding: RabbitMqGetMessagesEncoding::Auto,
+                truncate: None,
+            },
+        )
         .await
         .expect("failed to consume the message");
 

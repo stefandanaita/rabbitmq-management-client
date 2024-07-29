@@ -1,9 +1,14 @@
-use std::collections::HashMap;
-use rabbitmq_management_client::api::binding::{BindingApi, RabbitMqBindingDestinationType, RabbitMqBindingRequest};
-use rabbitmq_management_client::api::exchange::{ExchangeApi, RabbitMqExchangeRequest};
-use rabbitmq_management_client::api::message::{MessageApi, RabbitMqPublishMessageRequest, RabbitMqGetMessagesOptions, RabbitMqMessageEncoding, RabbitMqGetMessagesAckMode, RabbitMqGetMessagesEncoding};
-use rabbitmq_management_client::api::queue::{QueueApi, RabbitMqQueueRequest};
 use crate::context::TestContext;
+use rabbitmq_management_client::api::binding::{
+    BindingApi, RabbitMqBindingDestinationType, RabbitMqBindingRequest,
+};
+use rabbitmq_management_client::api::exchange::{ExchangeApi, RabbitMqExchangeRequest};
+use rabbitmq_management_client::api::message::{
+    MessageApi, RabbitMqGetMessagesAckMode, RabbitMqGetMessagesEncoding,
+    RabbitMqGetMessagesOptions, RabbitMqMessageEncoding, RabbitMqPublishMessageRequest,
+};
+use rabbitmq_management_client::api::queue::{QueueApi, RabbitMqQueueRequest};
+use std::collections::HashMap;
 
 #[tokio::test]
 async fn can_publish_message_to_exchange() {
@@ -30,7 +35,8 @@ async fn can_publish_message_to_exchange() {
         .expect("failed to create exchange");
 
     // Publish message to exchange
-    let published = ctx.rabbitmq
+    let published = ctx
+        .rabbitmq
         .publish_message(
             vhost.name.clone(),
             "test-exchange".to_string(),
@@ -39,7 +45,7 @@ async fn can_publish_message_to_exchange() {
                 routing_key: "test-queue-routing".to_string(),
                 payload: "first-message".to_string(),
                 payload_encoding: RabbitMqMessageEncoding::String,
-            }
+            },
         )
         .await
         .expect("failed to publish the message");
@@ -108,7 +114,8 @@ async fn can_consume_messages_from_queue() {
         .expect("failed to create binding");
 
     // Publish message to exchange
-    let published = ctx.rabbitmq
+    let published = ctx
+        .rabbitmq
         .publish_message(
             vhost.name.clone(),
             "test-exchange".to_string(),
@@ -117,7 +124,7 @@ async fn can_consume_messages_from_queue() {
                 routing_key: "test-queue-routing".to_string(),
                 payload: "first-message".to_string(),
                 payload_encoding: RabbitMqMessageEncoding::String,
-            }
+            },
         )
         .await
         .expect("failed to publish the message");
@@ -133,19 +140,24 @@ async fn can_consume_messages_from_queue() {
                 routing_key: "test-queue-routing".to_string(),
                 payload: "second-message".to_string(),
                 payload_encoding: RabbitMqMessageEncoding::String,
-            }
+            },
         )
         .await
         .expect("failed to publish the message");
 
     // Read the message from the queue
-    let messages = ctx.rabbitmq
-        .get_messages(vhost.name.clone(), "test-queue".to_string(), RabbitMqGetMessagesOptions {
-            count: 5,
-            ack_mode: RabbitMqGetMessagesAckMode::AckRequeueTrue,
-            encoding: RabbitMqGetMessagesEncoding::Auto,
-            truncate: None,
-        })
+    let messages = ctx
+        .rabbitmq
+        .get_messages(
+            vhost.name.clone(),
+            "test-queue".to_string(),
+            RabbitMqGetMessagesOptions {
+                count: 5,
+                ack_mode: RabbitMqGetMessagesAckMode::AckRequeueTrue,
+                encoding: RabbitMqGetMessagesEncoding::Auto,
+                truncate: None,
+            },
+        )
         .await
         .expect("failed to consume the message");
 

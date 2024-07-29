@@ -1,9 +1,9 @@
-use std::collections::HashMap;
-use async_trait::async_trait;
-use serde::{Deserialize, Serialize};
 use crate::api::_generic::handle_response;
 use crate::errors::RabbitMqClientError;
 use crate::RabbitMqClient;
+use async_trait::async_trait;
+use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
 
 #[async_trait]
 pub trait MessageApi {
@@ -57,10 +57,7 @@ impl MessageApi for RabbitMqClient {
             .client
             .request(
                 reqwest::Method::POST,
-                format!(
-                    "{}/api/queues/{}/{}/get",
-                    self.api_url, vhost, queue
-                ),
+                format!("{}/api/queues/{}/{}/get", self.api_url, vhost, queue),
             )
             .json(&options)
             .send()

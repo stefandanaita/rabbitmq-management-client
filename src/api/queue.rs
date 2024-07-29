@@ -3,9 +3,9 @@ use crate::api::binding::RabbitMqBinding;
 use crate::errors::RabbitMqClientError;
 use crate::RabbitMqClient;
 use async_trait::async_trait;
+use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
-use rust_decimal::Decimal;
 
 #[async_trait]
 pub trait QueueApi {
