@@ -4,7 +4,6 @@ use crate::errors::RabbitMqClientError;
 use crate::RabbitMqClient;
 use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
-use std::collections::HashMap;
 
 #[async_trait]
 pub trait ExchangeApi {
@@ -38,13 +37,6 @@ pub trait ExchangeApi {
         vhost: String,
         exchange: String,
     ) -> Result<(), RabbitMqClientError>;
-
-    async fn publish_message(
-        &self,
-        vhost: String,
-        exchange: String,
-        request: RabbitMqExchangeMessagePublishRequest,
-    ) -> Result<RabbitMqExchangeMessagePublishResponse, RabbitMqClientError>;
 
     async fn list_source_bindings(
         &self,
@@ -151,28 +143,6 @@ impl ExchangeApi for RabbitMqClient {
         handle_empty_response(response).await
     }
 
-    async fn publish_message(
-        &self,
-        vhost: String,
-        exchange: String,
-        request: RabbitMqExchangeMessagePublishRequest,
-    ) -> Result<RabbitMqExchangeMessagePublishResponse, RabbitMqClientError> {
-        let response = self
-            .client
-            .request(
-                reqwest::Method::POST,
-                format!(
-                    "{}/api/exchanges/{}/{}/publish",
-                    self.api_url, vhost, exchange
-                ),
-            )
-            .json(&request)
-            .send()
-            .await?;
-
-        handle_response(response).await
-    }
-
     async fn list_source_bindings(
         &self,
         vhost: String,
@@ -229,8 +199,8 @@ pub struct RabbitMqExchange {
 
 #[derive(Debug, Deserialize)]
 pub struct RabbitMqExchangeMessageStats {
-    pub publish_in: i64,
-    pub publish_out: i64,
+    pub publish_in: Option<i64>,
+    pub publish_out: Option<i64>,
 }
 
 #[derive(Debug, Serialize)]
@@ -240,25 +210,4 @@ pub struct RabbitMqExchangeRequest {
     pub auto_delete: bool,
     pub durable: bool,
     pub internal: bool,
-}
-
-#[derive(Debug, Serialize)]
-pub struct RabbitMqExchangeMessagePublishRequest {
-    pub properties: HashMap<String, String>,
-    pub routing_key: String,
-    pub payload: String,
-    pub payload_encoding: RabbitMqMessageEncoding,
-}
-
-#[derive(Debug, Serialize)]
-pub enum RabbitMqMessageEncoding {
-    #[serde(rename = "string")]
-    String,
-    #[serde(rename = "base64")]
-    Base64,
-}
-
-#[derive(Debug, Deserialize)]
-pub struct RabbitMqExchangeMessagePublishResponse {
-    pub routed: bool,
 }
