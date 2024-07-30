@@ -33,6 +33,7 @@ pub trait UserApi {
 
 #[async_trait]
 impl UserApi for RabbitMqClient {
+    #[tracing::instrument(skip(self))]
     async fn who_am_i(&self) -> Result<RabbitMqWhoAmI, RabbitMqClientError> {
         let response = self
             .client
@@ -43,6 +44,7 @@ impl UserApi for RabbitMqClient {
         handle_response(response).await
     }
 
+    #[tracing::instrument(skip(self))]
     async fn list_users(&self) -> Result<Vec<RabbitMqUser>, RabbitMqClientError> {
         let response = self
             .client
@@ -53,6 +55,7 @@ impl UserApi for RabbitMqClient {
         handle_response(response).await
     }
 
+    #[tracing::instrument(skip(self))]
     async fn list_users_without_permissions(
         &self,
     ) -> Result<Vec<RabbitMqUser>, RabbitMqClientError> {
@@ -68,6 +71,7 @@ impl UserApi for RabbitMqClient {
         handle_response(response).await
     }
 
+    #[tracing::instrument(skip(self))]
     async fn bulk_delete_users(
         &self,
         users: RabbitMqUsersBulkDeleteRequest,
@@ -85,6 +89,7 @@ impl UserApi for RabbitMqClient {
         handle_empty_response(response).await
     }
 
+    #[tracing::instrument(skip(self))]
     async fn list_user_permissions(
         &self,
         user: String,
@@ -101,6 +106,7 @@ impl UserApi for RabbitMqClient {
         handle_response(response).await
     }
 
+    #[tracing::instrument(skip(self))]
     async fn list_user_topic_permissions(
         &self,
         user: String,

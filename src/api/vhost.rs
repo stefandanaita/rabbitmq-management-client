@@ -37,6 +37,7 @@ pub trait VhostApi {
 
 #[async_trait]
 impl VhostApi for RabbitMqClient {
+    #[tracing::instrument(skip(self))]
     async fn list_vhosts(&self) -> Result<Vec<RabbitMqVhost>, RabbitMqClientError> {
         let response = self
             .client
@@ -47,6 +48,7 @@ impl VhostApi for RabbitMqClient {
         handle_response(response).await
     }
 
+    #[tracing::instrument(skip(self))]
     async fn get_vhost(&self, vhost: String) -> Result<RabbitMqVhost, RabbitMqClientError> {
         let response = self
             .client
@@ -60,6 +62,7 @@ impl VhostApi for RabbitMqClient {
         handle_response(response).await
     }
 
+    #[tracing::instrument(skip(self))]
     async fn create_vhost(&self, request: RabbitMqVhostRequest) -> Result<(), RabbitMqClientError> {
         let vhosts = self.list_vhosts().await?;
         if let Some(existing) = vhosts.iter().find(|v| v.name == request.name.clone()) {
@@ -72,6 +75,7 @@ impl VhostApi for RabbitMqClient {
         self.update_vhost(request).await
     }
 
+    #[tracing::instrument(skip(self))]
     async fn update_vhost(&self, request: RabbitMqVhostRequest) -> Result<(), RabbitMqClientError> {
         #[derive(Debug, Serialize)]
         struct RequestBody {
@@ -98,6 +102,7 @@ impl VhostApi for RabbitMqClient {
         handle_empty_response(response).await
     }
 
+    #[tracing::instrument(skip(self))]
     async fn delete_vhost(&self, vhost: String) -> Result<(), RabbitMqClientError> {
         let response = self
             .client
@@ -111,6 +116,7 @@ impl VhostApi for RabbitMqClient {
         handle_empty_response(response).await
     }
 
+    #[tracing::instrument(skip(self))]
     async fn start_vhost_on_node(
         &self,
         vhost: String,
@@ -128,6 +134,7 @@ impl VhostApi for RabbitMqClient {
         handle_empty_response(response).await
     }
 
+    #[tracing::instrument(skip(self))]
     async fn list_vhost_permissions(
         &self,
         vhost: String,
@@ -144,6 +151,7 @@ impl VhostApi for RabbitMqClient {
         handle_response(response).await
     }
 
+    #[tracing::instrument(skip(self))]
     async fn list_vhost_topic_permissions(
         &self,
         vhost: String,

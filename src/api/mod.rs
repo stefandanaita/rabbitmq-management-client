@@ -2,6 +2,7 @@ mod _generic;
 pub mod binding;
 pub mod connection;
 pub mod exchange;
+pub mod message;
 pub mod node;
 pub mod overview;
 pub mod permission;

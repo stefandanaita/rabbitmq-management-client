@@ -3,6 +3,7 @@ use http::StatusCode;
 use reqwest::Response;
 use serde::de::DeserializeOwned;
 
+#[tracing::instrument(skip(response))]
 pub async fn handle_response<T>(response: Response) -> Result<T, RabbitMqClientError>
 where
     T: DeserializeOwned,
@@ -24,6 +25,7 @@ where
     }
 }
 
+#[tracing::instrument(skip(response))]
 pub async fn handle_empty_response(response: Response) -> Result<(), RabbitMqClientError> {
     let status = response.status();
 

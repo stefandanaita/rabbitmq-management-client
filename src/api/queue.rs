@@ -3,6 +3,7 @@ use crate::api::binding::RabbitMqBinding;
 use crate::errors::RabbitMqClientError;
 use crate::RabbitMqClient;
 use async_trait::async_trait;
+use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
@@ -53,6 +54,7 @@ pub trait QueueApi {
 
 #[async_trait]
 impl QueueApi for RabbitMqClient {
+    #[tracing::instrument(skip(self))]
     async fn list_queues(
         &self,
         vhost: Option<String>,
@@ -69,6 +71,7 @@ impl QueueApi for RabbitMqClient {
         handle_response(response).await
     }
 
+    #[tracing::instrument(skip(self))]
     async fn get_queue(
         &self,
         vhost: String,
@@ -86,6 +89,7 @@ impl QueueApi for RabbitMqClient {
         handle_response(response).await
     }
 
+    #[tracing::instrument(skip(self))]
     async fn get_queue_bindings(
         &self,
         vhost: String,
@@ -103,6 +107,7 @@ impl QueueApi for RabbitMqClient {
         handle_response(response).await
     }
 
+    #[tracing::instrument(skip(self))]
     async fn create_queue(
         &self,
         vhost: String,
@@ -121,6 +126,7 @@ impl QueueApi for RabbitMqClient {
         }
     }
 
+    #[tracing::instrument(skip(self))]
     async fn update_queue(
         &self,
         vhost: String,
@@ -140,6 +146,7 @@ impl QueueApi for RabbitMqClient {
         handle_empty_response(response).await
     }
 
+    #[tracing::instrument(skip(self))]
     async fn delete_queue(&self, vhost: String, name: String) -> Result<(), RabbitMqClientError> {
         let response = self
             .client
@@ -153,6 +160,7 @@ impl QueueApi for RabbitMqClient {
         handle_empty_response(response).await
     }
 
+    #[tracing::instrument(skip(self))]
     async fn purge_queue(&self, vhost: String, name: String) -> Result<(), RabbitMqClientError> {
         let response = self
             .client
@@ -166,6 +174,7 @@ impl QueueApi for RabbitMqClient {
         handle_empty_response(response).await
     }
 
+    #[tracing::instrument(skip(self))]
     async fn set_queue_actions(
         &self,
         vhost: String,
@@ -190,7 +199,7 @@ impl QueueApi for RabbitMqClient {
 pub struct RabbitMqQueue {
     pub name: String,
     pub node: String,
-    pub arguments: HashMap<String, String>,
+    pub arguments: HashMap<String, RabbitMqArgument>,
     pub state: String,
     #[serde(rename = "type")]
     pub kind: String,
@@ -206,6 +215,13 @@ pub struct RabbitMqQueue {
     pub messages_unacknowledged: i64,
     pub garbage_collection: Option<RabbitMqQueueGarbageCollection>,
     pub message_stats: Option<RabbitMqQueueMessageStats>,
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(untagged)]
+pub enum RabbitMqArgument {
+    String(String),
+    Decimal(Decimal),
 }
 
 #[derive(Debug, Deserialize)]
