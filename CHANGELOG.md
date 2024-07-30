@@ -6,6 +6,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.0.1-alpha.13](https://github.com/stefandanaita/rabbitmq-management-client/compare/v0.0.1-alpha.12...v0.0.1-alpha.13) - 2024-07-25
+
+### Other
+- [OSS-26] Queues improvement ([#30](https://github.com/stefandanaita/rabbitmq-management-client/pull/30))
+
+## [0.0.1-alpha.12](https://github.com/stefandanaita/rabbitmq-management-client/compare/v0.0.1-alpha.11...v0.0.1-alpha.12) - 2024-07-24
+
+### Other
+- [OSS-26] Return messages in queues. Default to 0 when messages missing in vhosts & queues ([#28](https://github.com/stefandanaita/rabbitmq-management-client/pull/28))
+
 ## [0.0.1-alpha.11](https://github.com/stefandanaita/rabbitmq-management-client/compare/v0.0.1-alpha.10...v0.0.1-alpha.11) - 2024-07-22
 
 ### Other
