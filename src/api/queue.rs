@@ -208,6 +208,12 @@ pub struct RabbitMqQueue {
     pub durable: bool,
     pub exclusive: bool,
     #[serde(default)]
+    pub consumer_capacity: i64,
+    #[serde(default)]
+    pub consumer_utilisation: i64,
+    #[serde(default)]
+    pub consumers: i64,
+    #[serde(default)]
     pub messages: i64,
     #[serde(default)]
     pub messages_ready: i64,
