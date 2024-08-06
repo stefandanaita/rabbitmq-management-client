@@ -10,17 +10,17 @@ where
 {
     let status = response.status();
 
+    let text = response
+        .text()
+        .await
+        .map_err(RabbitMqClientError::ResponseError)?;
+
     if status.is_success() {
-        match response.json::<T>().await {
-            Ok(response) => Ok(response),
-            Err(e) => Err(RabbitMqClientError::ParsingError(e)),
+        match serde_json::from_str(&text) {
+            Ok(data) => Ok(data),
+            Err(e) => Err(RabbitMqClientError::JSONError(e)),
         }
     } else {
-        let text = response
-            .text()
-            .await
-            .map_err(RabbitMqClientError::ParsingError)?;
-
         Err(map_error(status, text))
     }
 }
@@ -35,7 +35,7 @@ pub async fn handle_empty_response(response: Response) -> Result<(), RabbitMqCli
         let text = response
             .text()
             .await
-            .map_err(RabbitMqClientError::ParsingError)?;
+            .map_err(RabbitMqClientError::ResponseError)?;
 
         Err(map_error(status, text))
     }

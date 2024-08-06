@@ -13,7 +13,9 @@ pub enum RabbitMqClientError {
     #[error("Invalid RabbitMq API url: {0}")]
     InvalidApiUrl(String),
     #[error("Failed to parse the API response: {0}")]
-    ParsingError(#[source] reqwest::Error),
+    JSONError(#[source] serde_json::Error),
+    #[error("Failed to handle response: {0}")]
+    ResponseError(#[source] reqwest::Error),
     #[error("Failed to execute the middleware: {0}")]
     Middleware(#[source] anyhow::Error),
     #[error("Failed to send the API request: {0}")]
