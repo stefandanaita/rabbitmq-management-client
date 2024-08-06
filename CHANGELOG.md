@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.0.1-alpha.15](https://github.com/stefandanaita/rabbitmq-management-client/compare/v0.0.1-alpha.14...v0.0.1-alpha.15) - 2024-08-05
+
+### Other
+- [OSS-26] Return consumer stats when querying queues ([#34](https://github.com/stefandanaita/rabbitmq-management-client/pull/34))
+
 ## [0.0.1-alpha.14](https://github.com/stefandanaita/rabbitmq-management-client/compare/v0.0.1-alpha.13...v0.0.1-alpha.14) - 2024-07-30
 
 ### Other
