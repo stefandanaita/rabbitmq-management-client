@@ -208,9 +208,9 @@ pub struct RabbitMqQueue {
     pub durable: bool,
     pub exclusive: bool,
     #[serde(default)]
-    pub consumer_capacity: i64,
+    pub consumer_capacity: Decimal,
     #[serde(default)]
-    pub consumer_utilisation: i64,
+    pub consumer_utilisation: Decimal,
     #[serde(default)]
     pub consumers: i64,
     #[serde(default)]
