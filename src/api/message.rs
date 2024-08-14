@@ -4,8 +4,8 @@ use crate::RabbitMqClient;
 use async_trait::async_trait;
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
-use std::collections::HashMap;
 use serde_repr::{Deserialize_repr, Serialize_repr};
+use std::collections::HashMap;
 
 #[async_trait]
 pub trait MessageApi {
@@ -68,19 +68,22 @@ impl MessageApi for RabbitMqClient {
 
         let messages = handle_response::<Vec<RabbitMqMessageObject>>(response).await?;
 
-        Ok(messages.into_iter().map(|m| RabbitMqMessage {
-            payload_bytes: m.payload_bytes,
-            redelivered: m.redelivered,
-            exchange: m.exchange,
-            routing_key: m.routing_key,
-            message_count: m.message_count,
-            payload: m.payload,
-            payload_encoding: m.payload_encoding,
-            properties: match m.properties {
-                RabbitMqMessageProps::Empty() => None,
-                RabbitMqMessageProps::Properties(p) => Some(p),
-            },
-        }).collect())
+        Ok(messages
+            .into_iter()
+            .map(|m| RabbitMqMessage {
+                payload_bytes: m.payload_bytes,
+                redelivered: m.redelivered,
+                exchange: m.exchange,
+                routing_key: m.routing_key,
+                message_count: m.message_count,
+                payload: m.payload,
+                payload_encoding: m.payload_encoding,
+                properties: match m.properties {
+                    RabbitMqMessageProps::Empty() => None,
+                    RabbitMqMessageProps::Properties(p) => Some(p),
+                },
+            })
+            .collect())
     }
 }
 

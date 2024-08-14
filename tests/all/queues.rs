@@ -3,7 +3,11 @@ use rabbitmq_management_client::api::binding::{
     BindingApi, RabbitMqBindingDestinationType, RabbitMqBindingRequest,
 };
 use rabbitmq_management_client::api::exchange::{ExchangeApi, RabbitMqExchangeRequest};
-use rabbitmq_management_client::api::message::{MessageApi, RabbitMqGetMessagesAckMode, RabbitMqGetMessagesEncoding, RabbitMqGetMessagesOptions, RabbitMqMessageEncoding, RabbitMqMessageProperties, RabbitMqPublishMessageRequest};
+use rabbitmq_management_client::api::message::{
+    MessageApi, RabbitMqGetMessagesAckMode, RabbitMqGetMessagesEncoding,
+    RabbitMqGetMessagesOptions, RabbitMqMessageEncoding, RabbitMqMessageProperties,
+    RabbitMqPublishMessageRequest,
+};
 use rabbitmq_management_client::api::queue::{QueueApi, RabbitMqQueueAction, RabbitMqQueueRequest};
 use rabbitmq_management_client::errors::RabbitMqClientError;
 use std::collections::HashMap;
