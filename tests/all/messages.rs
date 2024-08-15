@@ -255,7 +255,7 @@ async fn can_publish_and_consume_messages_with_nested_headers() {
         ),
         (
             "header_num".to_string(),
-            RabbitMqMessageHeader::Number(Decimal::from_f32(3.14).unwrap()),
+            RabbitMqMessageHeader::Number(Decimal::from_f32(32.12).unwrap()),
         ),
         (
             "header_bool".to_string(),
@@ -266,16 +266,15 @@ async fn can_publish_and_consume_messages_with_nested_headers() {
             RabbitMqMessageHeader::List(vec![
                 RabbitMqMessageHeader::String("nested_string".to_string()),
                 RabbitMqMessageHeader::Boolean(true),
-                RabbitMqMessageHeader::Number(Decimal::from_f32(6.28).unwrap()),
+                RabbitMqMessageHeader::Number(Decimal::from_f32(14.9).unwrap()),
                 RabbitMqMessageHeader::List(vec![
                     RabbitMqMessageHeader::String("double_nested_string".to_string()),
                     RabbitMqMessageHeader::Boolean(false),
-                    RabbitMqMessageHeader::Number(Decimal::from_f32(9.42).unwrap()),
+                    RabbitMqMessageHeader::Number(Decimal::from_u32(283).unwrap()),
                 ]),
             ]),
         ),
-    ])
-    .into();
+    ]);
 
     // Publish message to exchange
     let published = ctx
