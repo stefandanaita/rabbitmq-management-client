@@ -5,8 +5,8 @@ use rabbitmq_management_client::api::binding::{
 use rabbitmq_management_client::api::exchange::{ExchangeApi, RabbitMqExchangeRequest};
 use rabbitmq_management_client::api::message::{
     MessageApi, RabbitMqGetMessagesAckMode, RabbitMqGetMessagesEncoding,
-    RabbitMqGetMessagesOptions, RabbitMqHeader, RabbitMqMessageDeliveryMode,
-    RabbitMqMessageEncoding, RabbitMqMessageProperties, RabbitMqPublishMessageRequest,
+    RabbitMqGetMessagesOptions, RabbitMqMessageDeliveryMode, RabbitMqMessageEncoding,
+    RabbitMqMessageHeader, RabbitMqMessageProperties, RabbitMqPublishMessageRequest,
 };
 use rabbitmq_management_client::api::queue::{QueueApi, RabbitMqQueueRequest};
 use rust_decimal::prelude::FromPrimitive;
@@ -248,26 +248,29 @@ async fn can_publish_and_consume_messages_with_nested_headers() {
         .await
         .expect("failed to create binding");
 
-    let headers: HashMap<String, RabbitMqHeader> = HashMap::from([
+    let headers: HashMap<String, RabbitMqMessageHeader> = HashMap::from([
         (
             "header_str".to_string(),
-            RabbitMqHeader::String("value_str".to_string()),
+            RabbitMqMessageHeader::String("value_str".to_string()),
         ),
         (
             "header_num".to_string(),
-            RabbitMqHeader::Number(Decimal::from_f32(3.14).unwrap()),
+            RabbitMqMessageHeader::Number(Decimal::from_f32(3.14).unwrap()),
         ),
-        ("header_bool".to_string(), RabbitMqHeader::Boolean(true)),
+        (
+            "header_bool".to_string(),
+            RabbitMqMessageHeader::Boolean(true),
+        ),
         (
             "header_list".to_string(),
-            RabbitMqHeader::List(vec![
-                RabbitMqHeader::String("nested_string".to_string()),
-                RabbitMqHeader::Boolean(true),
-                RabbitMqHeader::Number(Decimal::from_f32(6.28).unwrap()),
-                RabbitMqHeader::List(vec![
-                    RabbitMqHeader::String("double_nested_string".to_string()),
-                    RabbitMqHeader::Boolean(false),
-                    RabbitMqHeader::Number(Decimal::from_f32(9.42).unwrap()),
+            RabbitMqMessageHeader::List(vec![
+                RabbitMqMessageHeader::String("nested_string".to_string()),
+                RabbitMqMessageHeader::Boolean(true),
+                RabbitMqMessageHeader::Number(Decimal::from_f32(6.28).unwrap()),
+                RabbitMqMessageHeader::List(vec![
+                    RabbitMqMessageHeader::String("double_nested_string".to_string()),
+                    RabbitMqMessageHeader::Boolean(false),
+                    RabbitMqMessageHeader::Number(Decimal::from_f32(9.42).unwrap()),
                 ]),
             ]),
         ),
