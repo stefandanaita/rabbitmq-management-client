@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.0.1-alpha.17](https://github.com/stefandanaita/rabbitmq-management-client/compare/v0.0.1-alpha.16...v0.0.1-alpha.17) - 2024-08-15
+
+### Other
+- [OSS-33] Deal with RabbitMq's message properties & headers ([#38](https://github.com/stefandanaita/rabbitmq-management-client/pull/38))
+
 ## [0.0.1-alpha.16](https://github.com/stefandanaita/rabbitmq-management-client/compare/v0.0.1-alpha.15...v0.0.1-alpha.16) - 2024-08-06
 
 ### Other
