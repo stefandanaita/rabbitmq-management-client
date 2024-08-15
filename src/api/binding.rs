@@ -207,14 +207,16 @@ pub struct RabbitMqBinding {
     pub source: String,
     pub vhost: String,
     pub destination: String,
-    pub destination_type: String,
+    pub destination_type: RabbitMqBindingDestinationType,
     pub routing_key: String,
     pub properties_key: String,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Deserialize)]
 pub enum RabbitMqBindingDestinationType {
+    #[serde(rename = "exchange")]
     Exchange,
+    #[serde(rename = "queue")]
     Queue,
 }
 
