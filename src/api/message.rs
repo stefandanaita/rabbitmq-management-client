@@ -32,7 +32,6 @@ impl MessageApi for RabbitMqClient {
         exchange: String,
         request: RabbitMqPublishMessageRequest,
     ) -> Result<RabbitMqPublishMessageResponse, RabbitMqClientError> {
-        println!("{}", serde_json::to_string(&request).unwrap());
         let response = self
             .client
             .request(
@@ -95,7 +94,7 @@ pub struct RabbitMqPublishMessageRequest {
     pub payload_encoding: RabbitMqMessageEncoding,
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub enum RabbitMqMessageEncoding {
     #[serde(rename = "string")]
     String,
@@ -103,7 +102,7 @@ pub enum RabbitMqMessageEncoding {
     Base64,
 }
 
-#[derive(Debug, Deserialize_repr, Serialize_repr)]
+#[derive(Debug, Clone, Deserialize_repr, Serialize_repr)]
 #[repr(u8)]
 pub enum RabbitMqMessageDeliveryMode {
     NonPersistent = 1,
@@ -161,7 +160,7 @@ enum RabbitMqMessageProps {
     Empty(),
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Clone, Deserialize)]
 pub struct RabbitMqMessage {
     pub payload_bytes: u64,
     pub redelivered: bool,
@@ -173,7 +172,7 @@ pub struct RabbitMqMessage {
     pub properties: Option<RabbitMqMessageProperties>,
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct RabbitMqMessageProperties {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub delivery_mode: Option<RabbitMqMessageDeliveryMode>,
@@ -183,7 +182,7 @@ pub struct RabbitMqMessageProperties {
     pub extra_properties: HashMap<String, String>,
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
 #[serde(untagged)]
 pub enum RabbitMqHeader {
     String(String),
