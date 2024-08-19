@@ -179,7 +179,7 @@ pub struct RabbitMqMessageProperties {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub headers: Option<HashMap<String, RabbitMqMessageHeader>>,
     #[serde(flatten)]
-    pub extra_properties: HashMap<String, String>,
+    pub extra_properties: HashMap<String, RabbitMqMessageProperty>,
 }
 
 #[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
@@ -188,5 +188,14 @@ pub enum RabbitMqMessageHeader {
     String(String),
     Number(Decimal),
     Boolean(bool),
+    HashMap(HashMap<String, RabbitMqMessageHeader>),
     List(Vec<RabbitMqMessageHeader>),
+}
+
+#[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
+#[serde(untagged)]
+pub enum RabbitMqMessageProperty {
+    String(String),
+    Number(Decimal),
+    Boolean(bool),
 }
