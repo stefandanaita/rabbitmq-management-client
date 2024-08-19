@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.0.1-alpha.19](https://github.com/stefandanaita/rabbitmq-management-client/compare/v0.0.1-alpha.18...v0.0.1-alpha.19) - 2024-08-19
+
+### Other
+- [OSS-115] Fix rmq message deserialization error caused by props ([#42](https://github.com/stefandanaita/rabbitmq-management-client/pull/42))
+
 ## [0.0.1-alpha.18](https://github.com/stefandanaita/rabbitmq-management-client/compare/v0.0.1-alpha.17...v0.0.1-alpha.18) - 2024-08-15
 
 ### Other
