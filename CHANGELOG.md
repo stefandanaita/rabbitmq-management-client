@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.0.1-alpha.21](https://github.com/stefandanaita/rabbitmq-management-client/compare/v0.0.1-alpha.20...v0.0.1-alpha.21) - 2024-08-19
+
+### Other
+- [OSS-115] Remove reqwest=0.12.5 pin ([#46](https://github.com/stefandanaita/rabbitmq-management-client/pull/46))
+
 ## [0.0.1-alpha.20](https://github.com/stefandanaita/rabbitmq-management-client/compare/v0.0.1-alpha.19...v0.0.1-alpha.20) - 2024-08-19
 
 ### Other
