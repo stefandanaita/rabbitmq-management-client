@@ -15,8 +15,8 @@ base64 = "0.22"
 chrono = { version = "0.4", features = ["serde"] }
 http = "1"
 reqwest = { version = "0.12", features = ["json"] }
-reqwest-middleware = { version = "0.3.1", features = ["json"] }
-rust_decimal = { version = "1.35", features = ["serde-float"] }
+reqwest-middleware = { version = "0.3", features = ["json"] }
+rust_decimal = { version = "1.36", features = ["serde-float"] }
 serde = { version = "1", features = ["derive"] }
 serde_json = { package = "serde_json_path_to_error", version = "0.1" }
 serde_repr = "0.1"
