@@ -6,7 +6,8 @@ use rabbitmq_management_client::api::exchange::{ExchangeApi, RabbitMqExchangeReq
 use rabbitmq_management_client::api::message::{
     MessageApi, RabbitMqGetMessagesAckMode, RabbitMqGetMessagesEncoding,
     RabbitMqGetMessagesOptions, RabbitMqMessageDeliveryMode, RabbitMqMessageEncoding,
-    RabbitMqMessageHeader, RabbitMqMessageProperties, RabbitMqPublishMessageRequest,
+    RabbitMqMessageHeader, RabbitMqMessageProperties, RabbitMqMessageProperty,
+    RabbitMqPublishMessageRequest,
 };
 use rabbitmq_management_client::api::queue::{QueueApi, RabbitMqQueueRequest};
 use rust_decimal::prelude::FromPrimitive;
@@ -286,7 +287,10 @@ async fn can_publish_and_consume_messages_with_nested_headers() {
                 properties: RabbitMqMessageProperties {
                     delivery_mode: Some(RabbitMqMessageDeliveryMode::NonPersistent),
                     headers: Some(headers.clone()),
-                    extra_properties: HashMap::from([("foo".to_string(), "bar".to_string())]),
+                    extra_properties: HashMap::from([(
+                        "foo".to_string(),
+                        RabbitMqMessageProperty::String("bar".to_string()),
+                    )]),
                 },
                 routing_key: "test-queue-routing".to_string(),
                 payload: "first-message".to_string(),
