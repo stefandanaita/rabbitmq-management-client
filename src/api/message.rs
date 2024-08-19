@@ -6,6 +6,7 @@ use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 use serde_repr::{Deserialize_repr, Serialize_repr};
 use std::collections::HashMap;
+use std::fmt::{Display, Formatter};
 
 #[async_trait]
 pub trait MessageApi {
@@ -198,4 +199,14 @@ pub enum RabbitMqMessageProperty {
     String(String),
     Number(Decimal),
     Boolean(bool),
+}
+
+impl Display for RabbitMqMessageProperty {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        match self {
+            RabbitMqMessageProperty::String(s) => write!(f, "{}", s),
+            RabbitMqMessageProperty::Number(d) => write!(f, "{}", d),
+            RabbitMqMessageProperty::Boolean(b) => write!(f, "{}", b),
+        }
+    }
 }
