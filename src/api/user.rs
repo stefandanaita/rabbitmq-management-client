@@ -11,6 +11,13 @@ pub trait UserApi {
 
     async fn list_users(&self) -> Result<Vec<RabbitMqUser>, RabbitMqClientError>;
 
+    async fn get_user(&self, name: String) -> Result<RabbitMqUser, RabbitMqClientError>;
+
+    async fn create_user(&self, user: RabbitMqUserCreateRequest)
+        -> Result<(), RabbitMqClientError>;
+
+    async fn delete_user(&self, name: String) -> Result<(), RabbitMqClientError>;
+
     async fn list_users_without_permissions(
         &self,
     ) -> Result<Vec<RabbitMqUser>, RabbitMqClientError>;
@@ -56,6 +63,50 @@ impl UserApi for RabbitMqClient {
     }
 
     #[tracing::instrument(skip(self))]
+    async fn get_user(&self, name: String) -> Result<RabbitMqUser, RabbitMqClientError> {
+        let response = self
+            .client
+            .request(
+                reqwest::Method::GET,
+                format!("{}/api/users/{}", self.api_url, name),
+            )
+            .send()
+            .await?;
+
+        handle_response(response).await
+    }
+
+    async fn create_user(
+        &self,
+        user: RabbitMqUserCreateRequest,
+    ) -> Result<(), RabbitMqClientError> {
+        let response = self
+            .client
+            .request(
+                reqwest::Method::PUT,
+                format!("{}/api/users/{}", self.api_url, user.name),
+            )
+            .json(&user)
+            .send()
+            .await?;
+
+        handle_empty_response(response).await
+    }
+
+    async fn delete_user(&self, name: String) -> Result<(), RabbitMqClientError> {
+        let response = self
+            .client
+            .request(
+                reqwest::Method::DELETE,
+                format!("{}/api/users/{}", self.api_url, name),
+            )
+            .send()
+            .await?;
+
+        handle_empty_response(response).await
+    }
+
+    #[tracing::instrument(skip(self))]
     async fn list_users_without_permissions(
         &self,
     ) -> Result<Vec<RabbitMqUser>, RabbitMqClientError> {
@@ -79,7 +130,7 @@ impl UserApi for RabbitMqClient {
         let response = self
             .client
             .request(
-                reqwest::Method::DELETE,
+                reqwest::Method::POST,
                 format!("{}/api/users/bulk-delete", self.api_url),
             )
             .json(&users)
@@ -134,11 +185,42 @@ pub struct RabbitMqWhoAmI {
 pub struct RabbitMqUser {
     pub name: String,
     pub password_hash: String,
-    pub hashing_algorithm: String,
+    pub hashing_algorithm: RabbitMqHashingAlgorithm,
     pub tags: Vec<String>,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+#[serde(rename_all = "snake_case")]
+pub enum RabbitMqUserTag {
+    Administrator,
+    Management,
+    Monitoring,
+}
+
+#[derive(Debug, Serialize)]
+pub struct RabbitMqUserCreateRequest {
+    #[serde(skip_serializing)]
+    pub name: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub password: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub password_hash: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub hashing_algorithm: Option<RabbitMqHashingAlgorithm>,
+    pub tags: Vec<RabbitMqUserTag>,
 }
 
 #[derive(Debug, Serialize)]
 pub struct RabbitMqUsersBulkDeleteRequest {
     pub users: Vec<String>,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub enum RabbitMqHashingAlgorithm {
+    #[serde(rename = "rabbit_password_hashing_sha256")]
+    RabbitPasswordHashingSha256,
+    #[serde(rename = "rabbit_password_hashing_sha512")]
+    RabbitPasswordHashingSha512,
+    #[serde(rename = "rabbit_password_hashing_md5")]
+    RabbitPasswordHashingMd5,
 }
