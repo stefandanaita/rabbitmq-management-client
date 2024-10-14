@@ -129,7 +129,6 @@ async fn can_bulk_delete_users() {
         .list_users()
         .await
         .expect("failed to list users");
-    dbg!(&original_users);
 
     let foo_uuid = Uuid::new_v4();
     ctx.rabbitmq
@@ -184,7 +183,6 @@ async fn can_bulk_delete_users() {
         .list_users()
         .await
         .expect("failed to list users");
-    dbg!(&new_users);
 
     assert_eq!(original_users.len(), new_users.len() - 4);
 
