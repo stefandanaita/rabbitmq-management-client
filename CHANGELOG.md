@@ -6,6 +6,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.0](https://github.com/stefandanaita/rabbitmq-management-client/compare/v0.1.0...v0.2.0) - 2024-10-14
+
+### Other
+
+- [OSS-116] Add support for CRUD operations on RabbitMq Users ([#51](https://github.com/stefandanaita/rabbitmq-management-client/pull/51))
+
 ## [0.1.0](https://github.com/stefandanaita/rabbitmq-management-client/compare/v0.0.1-alpha.20...v0.1.0) - 2024-08-19
 
 ### Other
