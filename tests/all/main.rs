@@ -5,4 +5,5 @@ mod exchanges;
 mod messages;
 mod nodes;
 mod queues;
+mod users;
 mod vhosts;
