@@ -41,7 +41,7 @@ async fn can_crud_users() {
         .expect("failed to get admin user");
 
     assert_eq!(admin.name, admin_uuid.clone().to_string());
-    assert!(admin.tags.contains(&"administrator".to_string()));
+    assert!(admin.tags.contains(&RabbitMqUserTag::Administrator));
 
     ctx.rabbitmq
         .delete_user(admin_uuid.clone().to_string())
@@ -75,8 +75,8 @@ async fn can_crud_users() {
         .expect("failed to get mnm user");
 
     assert_eq!(mnm.name, mnm_uuid.clone().to_string());
-    assert!(mnm.tags.contains(&"management".to_string()));
-    assert!(mnm.tags.contains(&"monitoring".to_string()));
+    assert!(mnm.tags.contains(&RabbitMqUserTag::Management));
+    assert!(mnm.tags.contains(&RabbitMqUserTag::Monitoring));
 
     ctx.rabbitmq
         .delete_user(mnm_uuid.clone().to_string())

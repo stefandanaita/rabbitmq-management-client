@@ -178,7 +178,7 @@ impl UserApi for RabbitMqClient {
 #[derive(Debug, Deserialize)]
 pub struct RabbitMqWhoAmI {
     pub name: String,
-    pub tags: Vec<String>,
+    pub tags: Vec<RabbitMqUserTag>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -186,10 +186,10 @@ pub struct RabbitMqUser {
     pub name: String,
     pub password_hash: String,
     pub hashing_algorithm: RabbitMqHashingAlgorithm,
-    pub tags: Vec<String>,
+    pub tags: Vec<RabbitMqUserTag>,
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize, Serialize, PartialEq)]
 #[serde(rename_all = "snake_case")]
 pub enum RabbitMqUserTag {
     Administrator,
