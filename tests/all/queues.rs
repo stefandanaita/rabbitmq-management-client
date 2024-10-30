@@ -52,7 +52,7 @@ async fn can_list_queues() {
 
     let queues = ctx
         .rabbitmq
-        .list_queues(Some(vhost.name.clone()))
+        .list_queues(Some(vhost.name.clone()), None)
         .await
         .expect("failed to list queues");
 
