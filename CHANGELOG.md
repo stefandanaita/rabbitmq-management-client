@@ -6,6 +6,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.0](https://github.com/stefandanaita/rabbitmq-management-client/compare/v0.2.0...v0.3.0) - 2024-10-31
+
+### Other
+
+- [OSS-118] Support for pagination ([#53](https://github.com/stefandanaita/rabbitmq-management-client/pull/53))
+
 ## [0.2.0](https://github.com/stefandanaita/rabbitmq-management-client/compare/v0.1.0...v0.2.0) - 2024-10-14
 
 ### Other
