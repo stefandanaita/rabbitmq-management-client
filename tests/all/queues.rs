@@ -9,6 +9,7 @@ use rabbitmq_management_client::api::message::{
     RabbitMqPublishMessageRequest,
 };
 use rabbitmq_management_client::api::queue::{QueueApi, RabbitMqQueueAction, RabbitMqQueueRequest};
+use rabbitmq_management_client::api::{RabbitMqPagination, RabbitMqPaginationFilter};
 use rabbitmq_management_client::errors::RabbitMqClientError;
 use std::collections::HashMap;
 
@@ -52,11 +53,154 @@ async fn can_list_queues() {
 
     let queues = ctx
         .rabbitmq
-        .list_queues(Some(vhost.name.clone()))
+        .list_queues(Some(vhost.name.clone()), None)
         .await
         .expect("failed to list queues");
 
-    assert_eq!(queues.len(), 2);
+    assert_eq!(queues.items.len(), 2);
+
+    ctx.delete_vhost(vhost.name)
+        .await
+        .expect("failed to delete vhost");
+}
+
+#[tokio::test]
+async fn can_list_queues_paginated() {
+    let ctx = TestContext::new();
+
+    let vhost = ctx
+        .create_random_vhost()
+        .await
+        .expect("failed to create vhost");
+
+    // Create a couple of queues
+    for i in 0..25 {
+        ctx.rabbitmq
+            .create_queue(
+                vhost.name.clone(),
+                format!("test-pagination_{}", i),
+                RabbitMqQueueRequest {
+                    auto_delete: false,
+                    durable: false,
+                    arguments: None,
+                    node: None,
+                },
+            )
+            .await
+            .expect("failed to create queue");
+    }
+
+    let queues = ctx
+        .rabbitmq
+        .list_queues(
+            Some(vhost.name.clone()),
+            Some(RabbitMqPagination {
+                page: 1,
+                page_size: Some(5),
+                filter: None,
+            }),
+        )
+        .await
+        .expect("failed to list queues");
+
+    assert_eq!(queues.items.len(), 5);
+
+    ctx.delete_vhost(vhost.name)
+        .await
+        .expect("failed to delete vhost");
+}
+
+#[tokio::test]
+async fn can_filter_queues() {
+    let ctx = TestContext::new();
+
+    let vhost = ctx
+        .create_random_vhost()
+        .await
+        .expect("failed to create vhost");
+
+    // Create a couple of queues
+    for i in 0..5 {
+        ctx.rabbitmq
+            .create_queue(
+                vhost.name.clone(),
+                format!("test-pagination_{}", i),
+                RabbitMqQueueRequest {
+                    auto_delete: false,
+                    durable: false,
+                    arguments: None,
+                    node: None,
+                },
+            )
+            .await
+            .expect("failed to create queue");
+    }
+
+    let queues = ctx
+        .rabbitmq
+        .list_queues(
+            Some(vhost.name.clone()),
+            Some(RabbitMqPagination {
+                page: 1,
+                page_size: None,
+                filter: Some(RabbitMqPaginationFilter::StringFilter(
+                    "test-pagination_3".to_string(),
+                )),
+            }),
+        )
+        .await
+        .expect("failed to list queues");
+
+    assert_eq!(queues.items.len(), 1);
+    assert_eq!(queues.items[0].name, "test-pagination_3");
+
+    ctx.delete_vhost(vhost.name)
+        .await
+        .expect("failed to delete vhost");
+}
+
+#[tokio::test]
+async fn can_regex_filter_queues() {
+    let ctx = TestContext::new();
+
+    let vhost = ctx
+        .create_random_vhost()
+        .await
+        .expect("failed to create vhost");
+
+    // Create a couple of queues
+    for i in 0..5 {
+        ctx.rabbitmq
+            .create_queue(
+                vhost.name.clone(),
+                format!("test-pagination_{}", i),
+                RabbitMqQueueRequest {
+                    auto_delete: false,
+                    durable: false,
+                    arguments: None,
+                    node: None,
+                },
+            )
+            .await
+            .expect("failed to create queue");
+    }
+
+    let queues = ctx
+        .rabbitmq
+        .list_queues(
+            Some(vhost.name.clone()),
+            Some(RabbitMqPagination {
+                page: 1,
+                page_size: None,
+                filter: Some(RabbitMqPaginationFilter::RegexFilter(
+                    "(test-pagination_3|test-pagination_0)".to_string(),
+                )),
+            }),
+        )
+        .await
+        .expect("failed to list queues");
+
+    assert_eq!(queues.items.len(), 2);
 
     ctx.delete_vhost(vhost.name)
         .await
