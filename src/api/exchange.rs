@@ -1,5 +1,7 @@
 use crate::api::_generic::{handle_empty_response, handle_response};
 use crate::api::binding::RabbitMqBinding;
+use crate::api::pagination::{RabbitMqPaginatedResponse, RabbitMqPaginationRequest};
+use crate::api::{RabbitMqPagination, RabbitMqPaginationFilter};
 use crate::errors::RabbitMqClientError;
 use crate::RabbitMqClient;
 use async_trait::async_trait;
@@ -10,7 +12,8 @@ pub trait ExchangeApi {
     async fn list_exchanges(
         &self,
         vhost: Option<String>,
-    ) -> Result<Vec<RabbitMqExchange>, RabbitMqClientError>;
+        pagination: Option<RabbitMqPagination>,
+    ) -> Result<RabbitMqPaginatedResponse<RabbitMqExchange>, RabbitMqClientError>;
 
     async fn get_exchange(
         &self,
@@ -56,7 +59,10 @@ impl ExchangeApi for RabbitMqClient {
     async fn list_exchanges(
         &self,
         vhost: Option<String>,
-    ) -> Result<Vec<RabbitMqExchange>, RabbitMqClientError> {
+        pagination: Option<RabbitMqPagination>,
+    ) -> Result<RabbitMqPaginatedResponse<RabbitMqExchange>, RabbitMqClientError> {
+        let pagination: RabbitMqPaginationRequest = pagination.unwrap_or_default().into();
+
         let response = self
             .client
             .request(
@@ -67,6 +73,7 @@ impl ExchangeApi for RabbitMqClient {
                     vhost.unwrap_or_default()
                 ),
             )
+            .query(&pagination)
             .send()
             .await?;
 
@@ -96,8 +103,20 @@ impl ExchangeApi for RabbitMqClient {
         exchange: String,
         request: RabbitMqExchangeRequest,
     ) -> Result<(), RabbitMqClientError> {
-        let exchanges = self.list_exchanges(Some(vhost.clone())).await?;
-        if let Some(existing) = exchanges.iter().find(|e| e.name == exchange) {
+        let exchanges = self
+            .list_exchanges(
+                Some(vhost.clone()),
+                Some(RabbitMqPagination {
+                    page: 1,
+                    page_size: None,
+                    filter: Some(RabbitMqPaginationFilter::RegexFilter(format!(
+                        "({exchange}$)"
+                    ))),
+                }),
+            )
+            .await?;
+
+        if let Some(existing) = exchanges.items.iter().find(|e| e.name == exchange) {
             return Err(RabbitMqClientError::AlreadyExists(format!(
                 "{} exchange",
                 existing.name

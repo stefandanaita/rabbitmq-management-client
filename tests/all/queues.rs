@@ -160,7 +160,7 @@ async fn can_filter_queues() {
 }
 
 #[tokio::test]
-async fn can_filter_queues_using_regex() {
+async fn can_regex_filter_queues() {
     let ctx = TestContext::new();
 
     let vhost = ctx

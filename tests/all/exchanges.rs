@@ -1,5 +1,6 @@
 use crate::context::TestContext;
 use rabbitmq_management_client::api::exchange::{ExchangeApi, RabbitMqExchangeRequest};
+use rabbitmq_management_client::api::{RabbitMqPagination, RabbitMqPaginationFilter};
 use rabbitmq_management_client::errors::RabbitMqClientError;
 
 #[tokio::test]
@@ -8,11 +9,150 @@ async fn can_list_exchanges() {
 
     let exchanges = ctx
         .rabbitmq
-        .list_exchanges(None)
+        .list_exchanges(None, None)
         .await
         .expect("failed to list exchanges");
 
-    assert!(!exchanges.is_empty());
+    assert!(!exchanges.items.is_empty());
+}
+
+#[tokio::test]
+async fn can_list_exchanges_paginated() {
+    let ctx = TestContext::new();
+
+    let vhost = ctx
+        .create_random_vhost()
+        .await
+        .expect("failed to create vhost");
+
+    for i in 0..20 {
+        ctx.rabbitmq
+            .create_exchange(
+                vhost.name.clone(),
+                format!("test-exchange_{i}"),
+                RabbitMqExchangeRequest {
+                    kind: "direct".to_string(),
+                    auto_delete: true,
+                    durable: false,
+                    internal: false,
+                },
+            )
+            .await
+            .expect("failed to create exchange");
+    }
+
+    let exchanges = ctx
+        .rabbitmq
+        .list_exchanges(
+            Some(vhost.name.clone()),
+            Some(RabbitMqPagination {
+                page: 1,
+                page_size: Some(5),
+                filter: None,
+            }),
+        )
+        .await
+        .expect("failed to list exchanges");
+
+    assert_eq!(exchanges.items.len(), 5);
+
+    ctx.delete_vhost(vhost.name)
+        .await
+        .expect("failed to delete vhost");
+}
+
+#[tokio::test]
+async fn can_filter_exchanges() {
+    let ctx = TestContext::new();
+
+    let vhost = ctx
+        .create_random_vhost()
+        .await
+        .expect("failed to create vhost");
+
+    for i in 0..5 {
+        ctx.rabbitmq
+            .create_exchange(
+                vhost.name.clone(),
+                format!("test-exchange_{i}"),
+                RabbitMqExchangeRequest {
+                    kind: "direct".to_string(),
+                    auto_delete: true,
+                    durable: false,
+                    internal: false,
+                },
+            )
+            .await
+            .expect("failed to create exchange");
+    }
+
+    let exchanges = ctx
+        .rabbitmq
+        .list_exchanges(
+            Some(vhost.name.clone()),
+            Some(RabbitMqPagination {
+                page: 1,
+                page_size: None,
+                filter: Some(RabbitMqPaginationFilter::StringFilter(
+                    "test-exchange_3".to_string(),
+                )),
+            }),
+        )
+        .await
+        .expect("failed to list exchanges");
+
+    assert_eq!(exchanges.items.len(), 1);
+
+    ctx.delete_vhost(vhost.name)
+        .await
+        .expect("failed to delete vhost");
+}
+
+#[tokio::test]
+async fn can_regex_filter_exchanges() {
+    let ctx = TestContext::new();
+
+    let vhost = ctx
+        .create_random_vhost()
+        .await
+        .expect("failed to create vhost");
+
+    for i in 0..5 {
+        ctx.rabbitmq
+            .create_exchange(
+                vhost.name.clone(),
+                format!("test-exchange_{i}"),
+                RabbitMqExchangeRequest {
+                    kind: "direct".to_string(),
+                    auto_delete: true,
+                    durable: false,
+                    internal: false,
+                },
+            )
+            .await
+            .expect("failed to create exchange");
+    }
+
+    let exchanges = ctx
+        .rabbitmq
+        .list_exchanges(
+            Some(vhost.name.clone()),
+            Some(RabbitMqPagination {
+                page: 1,
+                page_size: None,
+                filter: Some(RabbitMqPaginationFilter::RegexFilter(
+                    "(test-exchange_3$|test-exchange_0$)".to_string(),
+                )),
+            }),
+        )
+        .await
+        .expect("failed to list exchanges");
+
+    assert_eq!(exchanges.items.len(), 2);
+
+    ctx.delete_vhost(vhost.name)
+        .await
+        .expect("failed to delete vhost");
 }
 
 #[tokio::test]
