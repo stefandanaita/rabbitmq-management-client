@@ -1,6 +1,6 @@
 use crate::api::_generic::{handle_empty_response, handle_response};
 use crate::api::binding::RabbitMqBinding;
-use crate::api::pagination::RabbitMqPaginationRequest;
+use crate::api::pagination::{RabbitMqPaginatedResponse, RabbitMqPaginationRequest};
 use crate::api::RabbitMqPagination;
 use crate::errors::RabbitMqClientError;
 use crate::RabbitMqClient;
@@ -15,7 +15,7 @@ pub trait QueueApi {
         &self,
         vhost: Option<String>,
         pagination: Option<RabbitMqPagination>,
-    ) -> Result<Vec<RabbitMqQueue>, RabbitMqClientError>;
+    ) -> Result<RabbitMqPaginatedResponse<RabbitMqQueue>, RabbitMqClientError>;
 
     async fn get_queue(
         &self,
@@ -62,18 +62,18 @@ impl QueueApi for RabbitMqClient {
         &self,
         vhost: Option<String>,
         pagination: Option<RabbitMqPagination>,
-    ) -> Result<Vec<RabbitMqQueue>, RabbitMqClientError> {
-        let mut request = self.client.request(
-            reqwest::Method::GET,
-            format!("{}/api/queues/{}", self.api_url, vhost.unwrap_or_default()),
-        );
+    ) -> Result<RabbitMqPaginatedResponse<RabbitMqQueue>, RabbitMqClientError> {
+        let pagination: RabbitMqPaginationRequest = pagination.unwrap_or_default().into();
 
-        if let Some(pagination) = pagination {
-            let pagination: RabbitMqPaginationRequest = pagination.into();
-            request = request.query(&pagination)
-        }
-
-        let response = request.send().await?;
+        let response = self
+            .client
+            .request(
+                reqwest::Method::GET,
+                format!("{}/api/queues/{}", self.api_url, vhost.unwrap_or_default()),
+            )
+            .query(&pagination)
+            .send()
+            .await?;
 
         handle_response(response).await
     }

@@ -1,8 +1,10 @@
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
+
+const PAGINATION_PAGE_SIZE: u32 = 50;
 
 #[derive(Debug, Clone)]
 pub struct RabbitMqPagination {
-    pub page: Option<u32>,
+    pub page: u32,
     pub page_size: Option<u32>,
     pub filter: Option<RabbitMqPaginationFilter>,
 }
@@ -15,22 +17,37 @@ pub enum RabbitMqPaginationFilter {
 
 #[derive(Debug, Clone, Serialize)]
 pub struct RabbitMqPaginationRequest {
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub page: Option<u32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub page_size: Option<u32>,
+    pub page: u32,
+    pub page_size: u32,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub name: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub use_regex: Option<bool>,
-    pub pagination: bool,
+}
+
+#[derive(Debug, Clone, Deserialize)]
+pub struct RabbitMqPaginatedResponse<T> {
+    pub filtered_count: u32,
+    pub item_count: u32,
+    pub items: Vec<T>,
+    pub page: u32,
+    pub page_count: u32,
+    pub page_size: u32,
+    pub total_count: u32,
+}
+
+impl Default for RabbitMqPagination {
+    fn default() -> Self {
+        Self {
+            page: 1,
+            page_size: None,
+            filter: None,
+        }
+    }
 }
 
 impl From<RabbitMqPagination> for RabbitMqPaginationRequest {
     fn from(value: RabbitMqPagination) -> Self {
-        let pagination =
-            value.page.is_some() || value.page_size.is_some() || value.filter.is_some();
-
         let (name, use_regex) = match value.filter {
             None => (None, None),
             Some(f) => match f {
@@ -41,10 +58,9 @@ impl From<RabbitMqPagination> for RabbitMqPaginationRequest {
 
         Self {
             page: value.page,
-            page_size: value.page_size,
+            page_size: value.page_size.unwrap_or(PAGINATION_PAGE_SIZE),
             name,
             use_regex,
-            pagination,
         }
     }
 }
