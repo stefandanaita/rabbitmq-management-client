@@ -1,7 +1,7 @@
 use crate::api::_generic::{handle_empty_response, handle_response};
 use crate::api::binding::RabbitMqBinding;
-use crate::api::pagination::{RabbitMqPaginatedResponse, RabbitMqPaginationRequest};
-use crate::api::{RabbitMqPagination, RabbitMqPaginationFilter};
+use crate::api::pagination::RabbitMqPaginationRequest;
+use crate::api::{RabbitMqPaginatedResponse, RabbitMqPagination, RabbitMqPaginationFilter};
 use crate::errors::RabbitMqClientError;
 use crate::RabbitMqClient;
 use async_trait::async_trait;

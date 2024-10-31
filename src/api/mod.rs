@@ -11,4 +11,4 @@ pub mod queue;
 pub mod user;
 pub mod vhost;
 
-pub use pagination::{RabbitMqPagination, RabbitMqPaginationFilter};
+pub use pagination::{RabbitMqPaginatedResponse, RabbitMqPagination, RabbitMqPaginationFilter};
