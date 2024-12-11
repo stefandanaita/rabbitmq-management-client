@@ -210,6 +210,7 @@ pub struct RabbitMqBinding {
     pub destination_type: RabbitMqBindingDestinationType,
     pub routing_key: String,
     pub properties_key: String,
+    pub arguments: HashMap<String, String>,
 }
 
 #[derive(Debug, Deserialize)]
