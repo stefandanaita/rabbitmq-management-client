@@ -6,6 +6,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.0](https://github.com/stefandanaita/rabbitmq-management-client/compare/v0.3.0...v0.4.0) - 2024-12-13
+
+### Other
+
+- Bump jaxxstorm/action-install-gh-release from 1.13.0 to 1.14.0 in /.github/workflows ([#59](https://github.com/stefandanaita/rabbitmq-management-client/pull/59))
+- Add support for `arguments` field in `GET /api/queues/my_vhost/my_queue/bindings` ([#60](https://github.com/stefandanaita/rabbitmq-management-client/pull/60))
+- Bump jaxxstorm/action-install-gh-release from 1.12.0 to 1.13.0 in /.github/workflows ([#56](https://github.com/stefandanaita/rabbitmq-management-client/pull/56))
+
 ## [0.3.0](https://github.com/stefandanaita/rabbitmq-management-client/compare/v0.2.0...v0.3.0) - 2024-10-31
 
 ### Other
