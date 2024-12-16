@@ -6,6 +6,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.1](https://github.com/stefandanaita/rabbitmq-management-client/compare/v0.4.0...v0.4.1) - 2024-12-16
+
+### Other
+
+- Update thiserror requirement from 1 to 2 ([#55](https://github.com/stefandanaita/rabbitmq-management-client/pull/55))
+- Update reqwest-middleware requirement from 0.3 to 0.4 ([#57](https://github.com/stefandanaita/rabbitmq-management-client/pull/57))
+
 ## [0.4.0](https://github.com/stefandanaita/rabbitmq-management-client/compare/v0.3.0...v0.4.0) - 2024-12-13
 
 ### Other
