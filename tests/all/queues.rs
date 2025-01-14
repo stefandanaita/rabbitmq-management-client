@@ -747,7 +747,8 @@ async fn can_sort_queues() {
         .expect("failed to publish the message");
     assert!(published.routed);
 
-    // List queues ascending by number of messages
+    tokio::time::sleep(tokio::time::Duration::from_millis(5000)).await;
+
     let queues_ascending = ctx
         .rabbitmq
         .list_queues(
@@ -767,7 +768,6 @@ async fn can_sort_queues() {
     assert_eq!(queues_ascending.items.first().unwrap().name, "test-queue-2");
     assert_eq!(queues_ascending.items.last().unwrap().name, "test-queue-3");
 
-    // List queues descending by number of messages
     let queues_descending = ctx
         .rabbitmq
         .list_queues(
