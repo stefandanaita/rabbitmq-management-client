@@ -1,7 +1,7 @@
 use crate::api::_generic::{handle_empty_response, handle_response};
 use crate::api::binding::RabbitMqBinding;
-use crate::api::pagination::RabbitMqPaginationRequest;
-use crate::api::{RabbitMqPaginatedResponse, RabbitMqPagination};
+use crate::api::options::pagination::RabbitMqPaginationRequest;
+use crate::api::RabbitMqPaginatedResponse;
 use crate::errors::RabbitMqClientError;
 use crate::RabbitMqClient;
 use async_trait::async_trait;
@@ -9,12 +9,14 @@ use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
+use super::options::RabbitMqRequestOptions;
+
 #[async_trait]
 pub trait QueueApi {
     async fn list_queues(
         &self,
         vhost: Option<String>,
-        pagination: Option<RabbitMqPagination>,
+        options: Option<RabbitMqRequestOptions>,
     ) -> Result<RabbitMqPaginatedResponse<RabbitMqQueue>, RabbitMqClientError>;
 
     async fn get_queue(
@@ -61,9 +63,10 @@ impl QueueApi for RabbitMqClient {
     async fn list_queues(
         &self,
         vhost: Option<String>,
-        pagination: Option<RabbitMqPagination>,
+        options: Option<RabbitMqRequestOptions>,
     ) -> Result<RabbitMqPaginatedResponse<RabbitMqQueue>, RabbitMqClientError> {
-        let pagination: RabbitMqPaginationRequest = pagination.unwrap_or_default().into();
+        let options: RabbitMqRequestOptions = options.unwrap_or_default();
+        let pagination: RabbitMqPaginationRequest = options.pagination.unwrap_or_default().into();
 
         let response = self
             .client
@@ -72,6 +75,8 @@ impl QueueApi for RabbitMqClient {
                 format!("{}/api/queues/{}", self.api_url, vhost.unwrap_or_default()),
             )
             .query(&pagination)
+            .query(&options.sorting)
+            .query(&[("disable_stats", options.disable_stats)])
             .send()
             .await?;
 

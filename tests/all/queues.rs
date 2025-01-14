@@ -9,7 +9,9 @@ use rabbitmq_management_client::api::message::{
     RabbitMqPublishMessageRequest,
 };
 use rabbitmq_management_client::api::queue::{QueueApi, RabbitMqQueueAction, RabbitMqQueueRequest};
-use rabbitmq_management_client::api::{RabbitMqPagination, RabbitMqPaginationFilter};
+use rabbitmq_management_client::api::{
+    RabbitMqPagination, RabbitMqPaginationFilter, RabbitMqRequestOptions,
+};
 use rabbitmq_management_client::errors::RabbitMqClientError;
 use std::collections::HashMap;
 
@@ -94,10 +96,13 @@ async fn can_list_queues_paginated() {
         .rabbitmq
         .list_queues(
             Some(vhost.name.clone()),
-            Some(RabbitMqPagination {
-                page: 1,
-                page_size: Some(5),
-                filter: None,
+            Some(rabbitmq_management_client::api::RabbitMqRequestOptions {
+                pagination: Some(RabbitMqPagination {
+                    page: 1,
+                    page_size: Some(5),
+                    filter: None,
+                }),
+                ..Default::default()
             }),
         )
         .await
@@ -140,12 +145,15 @@ async fn can_filter_queues() {
         .rabbitmq
         .list_queues(
             Some(vhost.name.clone()),
-            Some(RabbitMqPagination {
-                page: 1,
-                page_size: None,
-                filter: Some(RabbitMqPaginationFilter::StringFilter(
-                    "test-pagination_3".to_string(),
-                )),
+            Some(RabbitMqRequestOptions {
+                pagination: Some(RabbitMqPagination {
+                    page: 1,
+                    page_size: None,
+                    filter: Some(RabbitMqPaginationFilter::StringFilter(
+                        "test-pagination_3".to_string(),
+                    )),
+                }),
+                ..Default::default()
             }),
         )
         .await
@@ -189,12 +197,15 @@ async fn can_regex_filter_queues() {
         .rabbitmq
         .list_queues(
             Some(vhost.name.clone()),
-            Some(RabbitMqPagination {
-                page: 1,
-                page_size: None,
-                filter: Some(RabbitMqPaginationFilter::RegexFilter(
-                    "(test-pagination_3|test-pagination_0)".to_string(),
-                )),
+            Some(RabbitMqRequestOptions {
+                pagination: Some(RabbitMqPagination {
+                    page: 1,
+                    page_size: None,
+                    filter: Some(RabbitMqPaginationFilter::RegexFilter(
+                        "(test-pagination_3|test-pagination_0)".to_string(),
+                    )),
+                }),
+                ..Default::default()
             }),
         )
         .await

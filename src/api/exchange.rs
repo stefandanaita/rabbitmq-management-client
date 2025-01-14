@@ -1,18 +1,20 @@
 use crate::api::_generic::{handle_empty_response, handle_response};
 use crate::api::binding::RabbitMqBinding;
-use crate::api::pagination::RabbitMqPaginationRequest;
 use crate::api::{RabbitMqPaginatedResponse, RabbitMqPagination, RabbitMqPaginationFilter};
 use crate::errors::RabbitMqClientError;
 use crate::RabbitMqClient;
 use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
 
+use super::options::pagination::RabbitMqPaginationRequest;
+use super::options::RabbitMqRequestOptions;
+
 #[async_trait]
 pub trait ExchangeApi {
     async fn list_exchanges(
         &self,
         vhost: Option<String>,
-        pagination: Option<RabbitMqPagination>,
+        options: Option<RabbitMqRequestOptions>,
     ) -> Result<RabbitMqPaginatedResponse<RabbitMqExchange>, RabbitMqClientError>;
 
     async fn get_exchange(
@@ -59,9 +61,10 @@ impl ExchangeApi for RabbitMqClient {
     async fn list_exchanges(
         &self,
         vhost: Option<String>,
-        pagination: Option<RabbitMqPagination>,
+        options: Option<RabbitMqRequestOptions>,
     ) -> Result<RabbitMqPaginatedResponse<RabbitMqExchange>, RabbitMqClientError> {
-        let pagination: RabbitMqPaginationRequest = pagination.unwrap_or_default().into();
+        let options: RabbitMqRequestOptions = options.unwrap_or_default();
+        let pagination: RabbitMqPaginationRequest = options.pagination.unwrap_or_default().into();
 
         let response = self
             .client
@@ -74,6 +77,8 @@ impl ExchangeApi for RabbitMqClient {
                 ),
             )
             .query(&pagination)
+            .query(&options.sorting)
+            .query(&[("disable_stats", options.disable_stats)])
             .send()
             .await?;
 
@@ -106,12 +111,15 @@ impl ExchangeApi for RabbitMqClient {
         let exchanges = self
             .list_exchanges(
                 Some(vhost.clone()),
-                Some(RabbitMqPagination {
-                    page: 1,
-                    page_size: None,
-                    filter: Some(RabbitMqPaginationFilter::RegexFilter(format!(
-                        "({exchange}$)"
-                    ))),
+                Some(RabbitMqRequestOptions {
+                    pagination: Some(RabbitMqPagination {
+                        page: 1,
+                        page_size: None,
+                        filter: Some(RabbitMqPaginationFilter::RegexFilter(format!(
+                            "({exchange}$)"
+                        ))),
+                    }),
+                    ..Default::default()
                 }),
             )
             .await?;
