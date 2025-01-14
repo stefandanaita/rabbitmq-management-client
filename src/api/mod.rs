@@ -13,5 +13,6 @@ pub mod vhost;
 
 pub use options::{
     pagination::{RabbitMqPaginatedResponse, RabbitMqPagination, RabbitMqPaginationFilter},
+    sorting::RabbitMqSorting,
     RabbitMqRequestOptions,
 };
