@@ -219,18 +219,12 @@ pub struct RabbitMqQueue {
     pub auto_delete: bool,
     pub durable: bool,
     pub exclusive: bool,
-    #[serde(default)]
-    pub consumer_capacity: Decimal,
-    #[serde(default)]
-    pub consumer_utilisation: Decimal,
-    #[serde(default)]
-    pub consumers: i64,
-    #[serde(default)]
-    pub messages: i64,
-    #[serde(default)]
-    pub messages_ready: i64,
-    #[serde(default)]
-    pub messages_unacknowledged: i64,
+    pub consumer_capacity: Option<Decimal>,
+    pub consumer_utilisation: Option<Decimal>,
+    pub consumers: Option<i64>,
+    pub messages: Option<i64>,
+    pub messages_ready: Option<i64>,
+    pub messages_unacknowledged: Option<i64>,
     pub garbage_collection: Option<RabbitMqQueueGarbageCollection>,
     pub message_stats: Option<RabbitMqQueueMessageStats>,
 }
