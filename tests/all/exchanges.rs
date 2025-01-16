@@ -1,6 +1,8 @@
 use crate::context::TestContext;
 use rabbitmq_management_client::api::exchange::{ExchangeApi, RabbitMqExchangeRequest};
-use rabbitmq_management_client::api::{RabbitMqPagination, RabbitMqPaginationFilter};
+use rabbitmq_management_client::api::{
+    RabbitMqPagination, RabbitMqPaginationFilter, RabbitMqRequestOptions,
+};
 use rabbitmq_management_client::errors::RabbitMqClientError;
 
 #[tokio::test]
@@ -45,10 +47,13 @@ async fn can_list_exchanges_paginated() {
         .rabbitmq
         .list_exchanges(
             Some(vhost.name.clone()),
-            Some(RabbitMqPagination {
-                page: 1,
-                page_size: Some(5),
-                filter: None,
+            Some(RabbitMqRequestOptions {
+                pagination: Some(RabbitMqPagination {
+                    page: 1,
+                    page_size: Some(5),
+                    filter: None,
+                }),
+                ..Default::default()
             }),
         )
         .await
@@ -90,12 +95,15 @@ async fn can_filter_exchanges() {
         .rabbitmq
         .list_exchanges(
             Some(vhost.name.clone()),
-            Some(RabbitMqPagination {
-                page: 1,
-                page_size: None,
-                filter: Some(RabbitMqPaginationFilter::StringFilter(
-                    "test-exchange_3".to_string(),
-                )),
+            Some(RabbitMqRequestOptions {
+                pagination: Some(RabbitMqPagination {
+                    page: 1,
+                    page_size: None,
+                    filter: Some(RabbitMqPaginationFilter::StringFilter(
+                        "test-exchange_3".to_string(),
+                    )),
+                }),
+                ..Default::default()
             }),
         )
         .await
@@ -137,12 +145,15 @@ async fn can_regex_filter_exchanges() {
         .rabbitmq
         .list_exchanges(
             Some(vhost.name.clone()),
-            Some(RabbitMqPagination {
-                page: 1,
-                page_size: None,
-                filter: Some(RabbitMqPaginationFilter::RegexFilter(
-                    "(test-exchange_3$|test-exchange_0$)".to_string(),
-                )),
+            Some(RabbitMqRequestOptions {
+                pagination: Some(RabbitMqPagination {
+                    page: 1,
+                    page_size: None,
+                    filter: Some(RabbitMqPaginationFilter::RegexFilter(
+                        "(test-exchange_3$|test-exchange_0$)".to_string(),
+                    )),
+                }),
+                ..Default::default()
             }),
         )
         .await

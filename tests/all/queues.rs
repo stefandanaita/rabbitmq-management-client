@@ -9,7 +9,9 @@ use rabbitmq_management_client::api::message::{
     RabbitMqPublishMessageRequest,
 };
 use rabbitmq_management_client::api::queue::{QueueApi, RabbitMqQueueAction, RabbitMqQueueRequest};
-use rabbitmq_management_client::api::{RabbitMqPagination, RabbitMqPaginationFilter};
+use rabbitmq_management_client::api::{
+    RabbitMqPagination, RabbitMqPaginationFilter, RabbitMqRequestOptions, RabbitMqSorting,
+};
 use rabbitmq_management_client::errors::RabbitMqClientError;
 use std::collections::HashMap;
 
@@ -94,10 +96,13 @@ async fn can_list_queues_paginated() {
         .rabbitmq
         .list_queues(
             Some(vhost.name.clone()),
-            Some(RabbitMqPagination {
-                page: 1,
-                page_size: Some(5),
-                filter: None,
+            Some(rabbitmq_management_client::api::RabbitMqRequestOptions {
+                pagination: Some(RabbitMqPagination {
+                    page: 1,
+                    page_size: Some(5),
+                    filter: None,
+                }),
+                ..Default::default()
             }),
         )
         .await
@@ -140,12 +145,15 @@ async fn can_filter_queues() {
         .rabbitmq
         .list_queues(
             Some(vhost.name.clone()),
-            Some(RabbitMqPagination {
-                page: 1,
-                page_size: None,
-                filter: Some(RabbitMqPaginationFilter::StringFilter(
-                    "test-pagination_3".to_string(),
-                )),
+            Some(RabbitMqRequestOptions {
+                pagination: Some(RabbitMqPagination {
+                    page: 1,
+                    page_size: None,
+                    filter: Some(RabbitMqPaginationFilter::StringFilter(
+                        "test-pagination_3".to_string(),
+                    )),
+                }),
+                ..Default::default()
             }),
         )
         .await
@@ -189,12 +197,15 @@ async fn can_regex_filter_queues() {
         .rabbitmq
         .list_queues(
             Some(vhost.name.clone()),
-            Some(RabbitMqPagination {
-                page: 1,
-                page_size: None,
-                filter: Some(RabbitMqPaginationFilter::RegexFilter(
-                    "(test-pagination_3|test-pagination_0)".to_string(),
-                )),
+            Some(RabbitMqRequestOptions {
+                pagination: Some(RabbitMqPagination {
+                    page: 1,
+                    page_size: None,
+                    filter: Some(RabbitMqPaginationFilter::RegexFilter(
+                        "(test-pagination_3|test-pagination_0)".to_string(),
+                    )),
+                }),
+                ..Default::default()
             }),
         )
         .await
@@ -558,6 +569,226 @@ async fn can_purge_queue() {
         .expect("failed to consume the message");
 
     assert!(messages.is_empty());
+
+    ctx.delete_vhost(vhost.name)
+        .await
+        .expect("failed to delete vhost");
+}
+
+#[tokio::test]
+async fn can_sort_queues() {
+    let ctx = TestContext::new();
+
+    let vhost = ctx
+        .create_random_vhost()
+        .await
+        .expect("failed to create vhost");
+
+    // Create the exchange
+    ctx.rabbitmq
+        .create_exchange(
+            vhost.name.clone(),
+            "test-exchange".to_string(),
+            RabbitMqExchangeRequest {
+                kind: "direct".to_string(),
+                auto_delete: true,
+                durable: false,
+                internal: false,
+            },
+        )
+        .await
+        .expect("failed to create exchange");
+
+    // Create the queues
+    ctx.rabbitmq
+        .create_queue(
+            vhost.name.clone(),
+            "test-queue-1".to_string(),
+            RabbitMqQueueRequest {
+                auto_delete: false,
+                durable: false,
+                arguments: None,
+                node: None,
+            },
+        )
+        .await
+        .expect("failed to create queue-1");
+
+    ctx.rabbitmq
+        .create_queue(
+            vhost.name.clone(),
+            "test-queue-2".to_string(),
+            RabbitMqQueueRequest {
+                auto_delete: false,
+                durable: false,
+                arguments: None,
+                node: None,
+            },
+        )
+        .await
+        .expect("failed to create queue-2");
+
+    ctx.rabbitmq
+        .create_queue(
+            vhost.name.clone(),
+            "test-queue-3".to_string(),
+            RabbitMqQueueRequest {
+                auto_delete: false,
+                durable: false,
+                arguments: None,
+                node: None,
+            },
+        )
+        .await
+        .expect("failed to create queue-3");
+
+    // Bind the exchange and the queues
+    ctx.rabbitmq
+        .create_binding(
+            vhost.name.clone(),
+            "test-exchange".to_string(),
+            "test-queue-1".to_string(),
+            RabbitMqBindingDestinationType::Queue,
+            RabbitMqBindingRequest {
+                routing_key: Some("test-queue-routing-1".to_string()),
+                arguments: Some(HashMap::from([("foo".to_string(), "bar".to_string())])),
+            },
+        )
+        .await
+        .expect("failed to create binding");
+
+    ctx.rabbitmq
+        .create_binding(
+            vhost.name.clone(),
+            "test-exchange".to_string(),
+            "test-queue-2".to_string(),
+            RabbitMqBindingDestinationType::Queue,
+            RabbitMqBindingRequest {
+                routing_key: Some("test-queue-routing-2".to_string()),
+                arguments: Some(HashMap::from([("foo".to_string(), "bar".to_string())])),
+            },
+        )
+        .await
+        .expect("failed to create binding");
+
+    ctx.rabbitmq
+        .create_binding(
+            vhost.name.clone(),
+            "test-exchange".to_string(),
+            "test-queue-3".to_string(),
+            RabbitMqBindingDestinationType::Queue,
+            RabbitMqBindingRequest {
+                routing_key: Some("test-queue-routing-3".to_string()),
+                arguments: Some(HashMap::from([("foo".to_string(), "bar".to_string())])),
+            },
+        )
+        .await
+        .expect("failed to create binding");
+
+    // Publish messages to exchange
+    // 1 message on queue-1, 2 message on queue-3
+    let published = ctx
+        .rabbitmq
+        .publish_message(
+            vhost.name.clone(),
+            "test-exchange".to_string(),
+            RabbitMqPublishMessageRequest {
+                properties: RabbitMqMessageProperties {
+                    delivery_mode: None,
+                    headers: None,
+                    extra_properties: Default::default(),
+                },
+                routing_key: "test-queue-routing-1".to_string(),
+                payload: "first-message".to_string(),
+                payload_encoding: RabbitMqMessageEncoding::String,
+            },
+        )
+        .await
+        .expect("failed to publish the message");
+    assert!(published.routed);
+
+    let published = ctx
+        .rabbitmq
+        .publish_message(
+            vhost.name.clone(),
+            "test-exchange".to_string(),
+            RabbitMqPublishMessageRequest {
+                properties: RabbitMqMessageProperties {
+                    delivery_mode: None,
+                    headers: None,
+                    extra_properties: Default::default(),
+                },
+                routing_key: "test-queue-routing-3".to_string(),
+                payload: "second-message".to_string(),
+                payload_encoding: RabbitMqMessageEncoding::String,
+            },
+        )
+        .await
+        .expect("failed to publish the message");
+    assert!(published.routed);
+
+    let published = ctx
+        .rabbitmq
+        .publish_message(
+            vhost.name.clone(),
+            "test-exchange".to_string(),
+            RabbitMqPublishMessageRequest {
+                properties: RabbitMqMessageProperties {
+                    delivery_mode: None,
+                    headers: None,
+                    extra_properties: Default::default(),
+                },
+                routing_key: "test-queue-routing-3".to_string(),
+                payload: "third-message".to_string(),
+                payload_encoding: RabbitMqMessageEncoding::String,
+            },
+        )
+        .await
+        .expect("failed to publish the message");
+    assert!(published.routed);
+
+    tokio::time::sleep(tokio::time::Duration::from_millis(5000)).await;
+
+    let queues_ascending = ctx
+        .rabbitmq
+        .list_queues(
+            Some(vhost.name.clone()),
+            Some(RabbitMqRequestOptions {
+                pagination: None,
+                sorting: Some(RabbitMqSorting {
+                    key: Some("messages".to_string()),
+                    reversed: false,
+                }),
+                ..Default::default()
+            }),
+        )
+        .await
+        .expect("failed to list queues");
+
+    assert_eq!(queues_ascending.items.first().unwrap().name, "test-queue-2");
+    assert_eq!(queues_ascending.items.last().unwrap().name, "test-queue-3");
+
+    let queues_descending = ctx
+        .rabbitmq
+        .list_queues(
+            Some(vhost.name.clone()),
+            Some(RabbitMqRequestOptions {
+                pagination: None,
+                sorting: Some(RabbitMqSorting {
+                    key: Some("messages".to_string()),
+                    reversed: true,
+                }),
+                ..Default::default()
+            }),
+        )
+        .await
+        .expect("failed to list queues");
+
+    assert_eq!(
+        queues_descending.items.first().unwrap().name,
+        "test-queue-3"
+    );
+    assert_eq!(queues_descending.items.last().unwrap().name, "test-queue-2");
 
     ctx.delete_vhost(vhost.name)
         .await

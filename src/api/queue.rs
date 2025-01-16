@@ -1,7 +1,7 @@
 use crate::api::_generic::{handle_empty_response, handle_response};
 use crate::api::binding::RabbitMqBinding;
-use crate::api::pagination::RabbitMqPaginationRequest;
-use crate::api::{RabbitMqPaginatedResponse, RabbitMqPagination};
+use crate::api::options::pagination::RabbitMqPaginationRequest;
+use crate::api::RabbitMqPaginatedResponse;
 use crate::errors::RabbitMqClientError;
 use crate::RabbitMqClient;
 use async_trait::async_trait;
@@ -9,12 +9,14 @@ use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
+use super::options::RabbitMqRequestOptions;
+
 #[async_trait]
 pub trait QueueApi {
     async fn list_queues(
         &self,
         vhost: Option<String>,
-        pagination: Option<RabbitMqPagination>,
+        options: Option<RabbitMqRequestOptions>,
     ) -> Result<RabbitMqPaginatedResponse<RabbitMqQueue>, RabbitMqClientError>;
 
     async fn get_queue(
@@ -61,9 +63,10 @@ impl QueueApi for RabbitMqClient {
     async fn list_queues(
         &self,
         vhost: Option<String>,
-        pagination: Option<RabbitMqPagination>,
+        options: Option<RabbitMqRequestOptions>,
     ) -> Result<RabbitMqPaginatedResponse<RabbitMqQueue>, RabbitMqClientError> {
-        let pagination: RabbitMqPaginationRequest = pagination.unwrap_or_default().into();
+        let options: RabbitMqRequestOptions = options.unwrap_or_default();
+        let pagination: RabbitMqPaginationRequest = options.pagination.unwrap_or_default().into();
 
         let response = self
             .client
@@ -72,6 +75,8 @@ impl QueueApi for RabbitMqClient {
                 format!("{}/api/queues/{}", self.api_url, vhost.unwrap_or_default()),
             )
             .query(&pagination)
+            .query(&options.sorting)
+            .query(&[("disable_stats", options.disable_stats)])
             .send()
             .await?;
 
@@ -214,18 +219,12 @@ pub struct RabbitMqQueue {
     pub auto_delete: bool,
     pub durable: bool,
     pub exclusive: bool,
-    #[serde(default)]
-    pub consumer_capacity: Decimal,
-    #[serde(default)]
-    pub consumer_utilisation: Decimal,
-    #[serde(default)]
-    pub consumers: i64,
-    #[serde(default)]
-    pub messages: i64,
-    #[serde(default)]
-    pub messages_ready: i64,
-    #[serde(default)]
-    pub messages_unacknowledged: i64,
+    pub consumer_capacity: Option<Decimal>,
+    pub consumer_utilisation: Option<Decimal>,
+    pub consumers: Option<i64>,
+    pub messages: Option<i64>,
+    pub messages_ready: Option<i64>,
+    pub messages_unacknowledged: Option<i64>,
     pub garbage_collection: Option<RabbitMqQueueGarbageCollection>,
     pub message_stats: Option<RabbitMqQueueMessageStats>,
 }
