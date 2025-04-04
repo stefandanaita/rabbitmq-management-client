@@ -186,7 +186,7 @@ async fn can_consume_messages_from_queue() {
     assert_eq!(first_message.routing_key, "test-queue-routing");
     assert_eq!(first_message.payload, "first-message");
 
-    let second_message = messages.last().unwrap();
+    let second_message = messages.iter().next_back().unwrap();
     assert_eq!(second_message.routing_key, "test-queue-routing");
     assert_eq!(second_message.payload, "second-message");
 
@@ -320,7 +320,7 @@ async fn can_publish_and_consume_messages_with_nested_headers() {
 
     assert_eq!(messages.len(), 1);
 
-    let message = messages.into_iter().last().unwrap();
+    let message = messages.into_iter().next_back().unwrap();
     assert_eq!(
         message.clone().properties.unwrap().headers.unwrap(),
         headers
