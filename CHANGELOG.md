@@ -6,6 +6,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.1](https://github.com/stefandanaita/rabbitmq-management-client/compare/v0.5.0...v0.5.1) - 2025-04-04
+
+### Other
+
+- [OSS-122] Use next_back() instead of last() to avoid complete iteration ([#67](https://github.com/stefandanaita/rabbitmq-management-client/pull/67))
+- Bump jaxxstorm/action-install-gh-release from 1.14.0 to 2.0.0 in /.github/workflows ([#65](https://github.com/stefandanaita/rabbitmq-management-client/pull/65))
+
 ## [0.5.0](https://github.com/stefandanaita/rabbitmq-management-client/compare/v0.4.1...v0.5.0) - 2025-01-16
 
 ### Other
