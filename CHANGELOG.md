@@ -6,6 +6,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.2](https://github.com/stefandanaita/rabbitmq-management-client/compare/v0.5.1...v0.5.2) - 2025-06-08
+
+### Other
+
+- Bump jaxxstorm/action-install-gh-release from 2.0.0 to 2.1.0 in /.github/workflows ([#68](https://github.com/stefandanaita/rabbitmq-management-client/pull/68))
+- [OSS-117] Documentation ([#69](https://github.com/stefandanaita/rabbitmq-management-client/pull/69))
+
 ## [0.5.1](https://github.com/stefandanaita/rabbitmq-management-client/compare/v0.5.0...v0.5.1) - 2025-04-04
 
 ### Other
